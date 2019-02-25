@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -51,6 +52,7 @@ public class FragmentOne extends Fragment {
     private double mCurrentLongitude;
     public LocationClient mLocationClient;
     private TextView positionText;
+    private FloatingActionButton floatingActionButton;
     private MapView mapView;
     private BaiduMap baiduMap;
     public boolean isFirstLocate=true;
@@ -95,7 +97,20 @@ public class FragmentOne extends Fragment {
     @Override
     public void onStart() {
         positionText=getView().findViewById(R.id.position_text_view);
+        floatingActionButton=getView().findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng ll=new LatLng(mCurrentLatitude,mCurrentLongitude);
+                MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(ll);
+                baiduMap.animateMapStatus(update);
+                update=MapStatusUpdateFactory.zoomTo(19f);
+                baiduMap.animateMapStatus(update);
+            }
+        });
         mapView=getView().findViewById(R.id.bmapview);
+        //移除百度地图LOGO
+        mapView.removeViewAt(1);
         baiduMap=mapView.getMap();
         baiduMap.setTrafficEnabled(true);
         baiduMap.setMyLocationEnabled(true);
