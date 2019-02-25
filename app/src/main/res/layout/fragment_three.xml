@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
@@ -8,13 +9,15 @@
         android:orientation="vertical"
         android:background="#00BBD3"
         android:gravity="center">
-        <TextView
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="这是第三个页面"
-            android:textSize="30dp"
-            android:textColor="#ffffff"
-            android:gravity="center"/>
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/nav_menu"
+            app:headerLayout="@layout/nav_herder"
+           />
 
     </LinearLayout>
 </LinearLayout>
