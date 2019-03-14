@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,6 @@ public class FragmentOne extends Fragment {
         View view=inflater.inflate(R.layout.fragment_one,container,false);
         return view;
     }
-
     @Override
     public void onStart() {
         positionText=getView().findViewById(R.id.position_text_view);

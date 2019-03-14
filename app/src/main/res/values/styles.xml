@@ -1,5 +1,8 @@
 <resources>
-
+    <!--设置欢迎页作为activity背景-->
+    <style name="AppWelcome" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/logo</item>
+    </style>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
