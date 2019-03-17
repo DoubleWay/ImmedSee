@@ -2,6 +2,7 @@ package com.example.immedsee.fragment;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,7 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.view.KeyEvent;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,9 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 import com.example.immedsee.R;
+import com.example.immedsee.SearchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +59,7 @@ public class FragmentOne extends Fragment {
     private FloatingActionButton floatingActionButton;
     private MapView mapView;
     private BaiduMap baiduMap;
+    private CardView searchCardView;
     public boolean isFirstLocate=true;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,7 +100,6 @@ public class FragmentOne extends Fragment {
     }
     @Override
     public void onStart() {
-        positionText=getView().findViewById(R.id.position_text_view);
         floatingActionButton=getView().findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +109,14 @@ public class FragmentOne extends Fragment {
                 baiduMap.animateMapStatus(update);
                 update=MapStatusUpdateFactory.zoomTo(19f);
                 baiduMap.animateMapStatus(update);
+            }
+        });
+        searchCardView=getView().findViewById(R.id.toSearch);
+        searchCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent  intent=new Intent(getActivity().getApplicationContext(), SearchActivity.class);
+                startActivity(intent);
             }
         });
         mapView=getView().findViewById(R.id.bmapview);
@@ -296,6 +307,11 @@ public class FragmentOne extends Fragment {
     private void navigateTo(BDLocation bdLocation) {
         if(isFirstLocate){
             LatLng ll=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
+
+            /*CoordinateConverter converter = new CoordinateConverter();
+            converter.from(CoordinateConverter.CoordType.GPS);
+            converter.coord(ll);
+            LatLng llChange=converter.convert();*/
             MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
             update=MapStatusUpdateFactory.zoomTo(19f);

@@ -4,11 +4,12 @@
         <item name="android:windowBackground">@drawable/logo</item>
     </style>
     <!-- Base application theme. -->
+    <!--不带actionbar的主题-->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/cardview_dark_background</item> //修改全局获取焦点为黑色 比如光标
     </style>
 
 </resources>

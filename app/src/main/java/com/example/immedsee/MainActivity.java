@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
         setDefaultFragment();
         mTextMessage = (TextView) findViewById(R.id.message);
-        Toolbar toolbar=(Toolbar)findViewById(R.id.toolBar);
-        setSupportActionBar(toolbar);
+        /*Toolbar toolbar=(Toolbar)findViewById(R.id.toolBar);
+        setSupportActionBar(toolbar);*/
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }

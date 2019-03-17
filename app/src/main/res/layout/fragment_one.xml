@@ -3,27 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
-        <TextView
-            android:id="@+id/position_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:gravity="center"
-            android:visibility="gone"
-            />
+
         <com.baidu.mapapi.map.MapView
             android:id="@+id/bmapview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
             />
-
-    </LinearLayout>
+                <android.support.v7.widget.CardView
+                android:id="@+id/toSearch"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="2dp"
+                app:cardElevation="5dp"
+               >
+              <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="10dp"
+                  android:drawableLeft="@drawable/icon_search"
+                  android:gravity="center"
+                  android:textSize="40px"
+                  android:hint="搜索地点，查公交，找路线"
+                  />
+            </android.support.v7.widget.CardView>
+           <!-- <TextView
+                android:id="@+id/tvSeek"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="#e3e7f1"
+                android:drawableLeft="@drawable/icon_search"
+                android:gravity="center"
+                android:textSize="40px"
+                android:elevation="100dp"
+                android:hint="搜索地点，查公交，找路线"/>-->
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
