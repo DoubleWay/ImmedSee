@@ -15,10 +15,21 @@
       app:contentInsetStartWithNavigation="0dp"
       >
   </android.support.v7.widget.Toolbar>
-
+  <android.support.v7.widget.RecyclerView
+      android:id="@+id/suggest_search_list"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content">
+  </android.support.v7.widget.RecyclerView>
+  <com.baidu.mapapi.map.MapView
+      android:id="@+id/searchbmapview"
+      android:layout_width="match_parent"
+      android:layout_height="300dp"
+      android:clickable="true"
+      />
   <TextView
       android:id="@+id/test_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       />
+
 </LinearLayout>
