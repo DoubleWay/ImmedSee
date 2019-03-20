@@ -29,7 +29,13 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="即视" />
+            android:label="即视" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name="com.baidu.location.f"
@@ -43,11 +49,7 @@
 
         </activity>
         <activity android:name=".SearchActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".SearchResultActivity"></activity>
     </application>

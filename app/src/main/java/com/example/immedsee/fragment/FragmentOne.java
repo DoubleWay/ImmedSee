@@ -54,6 +54,7 @@ public class FragmentOne extends Fragment {
     private float mCurrentAccracy;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
+    private BDLocation mCurrentLoction;
     public LocationClient mLocationClient;
     private TextView positionText;
     private FloatingActionButton floatingActionButton;
@@ -116,7 +117,7 @@ public class FragmentOne extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent  intent=new Intent(getActivity().getApplicationContext(), SearchActivity.class);
-
+               intent.putExtra("LoctionCity",mCurrentLoction.getCity());
                 startActivity(intent);
             }
         });
@@ -328,6 +329,7 @@ public class FragmentOne extends Fragment {
         /**
          * 保存第一次定位的数据
          */
+        mCurrentLoction=bdLocation;
         mCurrentAccracy= bdLocation.getRadius();
         mCurrentLatitude= bdLocation.getLatitude();
         mCurrentLongitude= bdLocation.getLongitude();

@@ -153,6 +153,8 @@ public class SearchResultActivity extends AppCompatActivity {
     }
 
     private void marker() {
+        MapStatusUpdate  update=MapStatusUpdateFactory.zoomTo(12.5f);
+        baiduMap.animateMapStatus(update);
         BitmapDescriptor bitmap = BitmapDescriptorFactory
                 .fromResource(R.drawable.icon_mark);
 //构建MarkerOption，用于在地图上添加Marker
