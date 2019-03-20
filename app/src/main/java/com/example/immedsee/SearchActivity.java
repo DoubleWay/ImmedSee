@@ -67,6 +67,7 @@ public class SearchActivity extends AppCompatActivity {
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
     private int mXDirection;
     private float mCurrentAccracy;
+
     private double mCurrentLatitude;
     private double mCurrentLongitude;
     public LocationClient mLocationClient;
@@ -82,10 +83,8 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         mLocationClient=new LocationClient(getApplicationContext());
-       mLocationClient.registerLocationListener(new MyLocationListener());
+        mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_search);
        //创建显示模糊搜索结果的列表
@@ -112,7 +111,7 @@ public class SearchActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         //地图需要的权限申请
-        List<String> permissionList=new ArrayList<>();
+        /*List<String> permissionList=new ArrayList<>();
         if(ContextCompat.checkSelfPermission(this,Manifest.permission
                 .ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -130,8 +129,8 @@ public class SearchActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,permissions,1);
         }else {
             requestLocation();
-        }
-
+        }*/
+        requestLocation();
     }
     private void requestLocation() {
         initLocation();
@@ -140,14 +139,14 @@ public class SearchActivity extends AppCompatActivity {
     private void initLocation() {
         LocationClientOption option=new LocationClientOption();
         option.setCoorType("bd09ll");
-        option.setScanSpan(1000);
+       // option.setScanSpan(1000);
         option.setOpenGps(true);
         //  option.setLocationMode(LocationClientOption.LocationMode.Device_Sensors);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
 
-    @Override
+   /* @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case 1:
@@ -168,7 +167,7 @@ public class SearchActivity extends AppCompatActivity {
             default:
                 break;
         }
-    }
+    }*/
     public class MyLocationListener extends BDAbstractLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
@@ -221,10 +220,13 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //POI周边搜索
-                mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(10)).radius(1000)
+               /* mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(10)).radius(1000)
                         .location(new LatLng(mcurrentLoction.getLatitude(),mcurrentLoction.getLongitude()))
                         .keyword(query));
-                recyclerView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);*/
+               Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
+               intent.putExtra("Query",query);
+               startActivity(intent);
                 return true;
             }
 
@@ -270,21 +272,25 @@ public class SearchActivity extends AppCompatActivity {
                         SuggestionResult.SuggestionInfo suggestionInfo=resl.get(position);
                         Toast.makeText(SearchActivity.this,suggestionInfo.getUid(),Toast.LENGTH_SHORT).show();
                         //mPoiSearch.searchPoiDetail(new PoiDetailSearchOption().poiUid(suggestionInfo.getUid()));
-                        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(suggestionInfo.getPt()));
-                        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                                .fromResource(R.drawable.icon_mark);
+                        if(suggestionInfo.getPt()!=null) {
+                            Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
+                            intent.putExtra("Latitude",suggestionInfo.getPt().latitude);
+                            intent.putExtra("Longitude",suggestionInfo.getPt().longitude);
+                            startActivity(intent);
+                      /*      baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(suggestionInfo.getPt()));
+                            BitmapDescriptor bitmap = BitmapDescriptorFactory
+                                    .fromResource(R.drawable.icon_mark);
 //构建MarkerOption，用于在地图上添加Marker
-                        OverlayOptions option = new MarkerOptions()
-                                .position(suggestionInfo.getPt())
-                                .icon(bitmap);
-                       // Bundle bundle = new Bundle();
-                        //info必须实现序列化接口
-                       // bundle.putParcelable("info", p);
-                        //在地图上添加Marker，并显示
-                        baiduMap.addOverlay(option);
-                        recyclerView.setVisibility(View.GONE);
-
-
+                            OverlayOptions option = new MarkerOptions()
+                                    .position(suggestionInfo.getPt())
+                                    .icon(bitmap);
+                            // Bundle bundle = new Bundle();
+                            //info必须实现序列化接口
+                            // bundle.putParcelable("info", p);
+                            //在地图上添加Marker，并显示
+                            baiduMap.addOverlay(option);*/
+                            recyclerView.setVisibility(View.GONE);
+                        }
                     }
                 });
             }
@@ -348,8 +354,9 @@ public class SearchActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                Intent intent=new Intent(this,MainActivity.class);
-                startActivity(intent);
+                /*Intent intent=new Intent(this,MainActivity.class);
+                startActivity(intent);*/
+                finish();
                 break;
         }
         return  true;

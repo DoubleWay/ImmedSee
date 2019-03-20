@@ -116,6 +116,7 @@ public class FragmentOne extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent  intent=new Intent(getActivity().getApplicationContext(), SearchActivity.class);
+
                 startActivity(intent);
             }
         });
