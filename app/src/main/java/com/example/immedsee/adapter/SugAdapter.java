@@ -20,17 +20,20 @@ import java.util.List;
  */
 public class SugAdapter extends RecyclerView.Adapter<SugAdapter.ViewHolder>{
        private Context mContext;
+       private OnItemClickListener mOnItemClickListener;
        private List<SuggestionResult.SuggestionInfo> mSuggestionInfoList;
 
 
     static  class ViewHolder extends RecyclerView.ViewHolder{
         private CardView cardView;
-        private TextView suggestResuitView;
+        private TextView suggestResuitKeyView;
+        private TextView suggestResuitDisView;
 
           public ViewHolder(View view){
               super(view);
               cardView=(CardView)view;
-              suggestResuitView=(TextView)view.findViewById(R.id.suggest_search_result);
+              suggestResuitKeyView=(TextView)view.findViewById(R.id.suggest_search_result_key);
+              suggestResuitDisView=(TextView)view.findViewById(R.id.suggest_search_result_dis);
           }
 
 
@@ -51,9 +54,20 @@ public class SugAdapter extends RecyclerView.Adapter<SugAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         SuggestionResult.SuggestionInfo suggestionRe=mSuggestionInfoList.get(position);
-        holder.suggestResuitView.setText(suggestionRe.getCity()+suggestionRe.getDistrict()+suggestionRe.getKey());
+        holder.suggestResuitKeyView.setText(suggestionRe.getKey());
+        holder.suggestResuitDisView.setText(suggestionRe.getCity()+suggestionRe.getDistrict());
+
+        if (mOnItemClickListener != null) {
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getLayoutPosition();
+                    mOnItemClickListener.onItemClick(holder.cardView, position);
+                }
+            });
+        }
     }
 
     @Override
@@ -61,5 +75,12 @@ public class SugAdapter extends RecyclerView.Adapter<SugAdapter.ViewHolder>{
         return mSuggestionInfoList.size();
     }
 
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
 }

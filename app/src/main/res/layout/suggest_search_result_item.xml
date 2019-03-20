@@ -7,13 +7,20 @@
     >
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 <TextView
-    android:id="@+id/suggest_search_result"
-    android:layout_width="wrap_content"
+    android:id="@+id/suggest_search_result_key"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textSize="20dp"
+    android:textSize="15dp"
     />
+  <TextView
+      android:id="@+id/suggest_search_result_dis"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textSize="12dp"
+      />
 </LinearLayout>
 </android.support.v7.widget.CardView>

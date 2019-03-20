@@ -43,6 +43,7 @@ import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
@@ -62,9 +63,8 @@ public class SearchActivity extends AppCompatActivity {
     private SearchView mSearchView;
     private PoiSearch mPoiSearch;
     private SuggestionSearch mSuggestionSearch;
-    private TextView textView;
+   // private TextView textView;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
-    public FragmentOne.MyOrientationListener myOrientationListener;
     private int mXDirection;
     private float mCurrentAccracy;
     private double mCurrentLatitude;
@@ -184,8 +184,8 @@ public class SearchActivity extends AppCompatActivity {
             LatLng ll=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
             MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
-            update=MapStatusUpdateFactory.zoomTo(19f);
-            baiduMap.animateMapStatus(update);
+           /* update=MapStatusUpdateFactory.zoomTo(19f);
+            baiduMap.animateMapStatus(update);*/
             isFirstLocate=false;
         }
         MyLocationData myLocationData=new MyLocationData.Builder()
@@ -254,17 +254,41 @@ public class SearchActivity extends AppCompatActivity {
                 //未找到相关结果
             }else
             {
-                List<SuggestionResult.SuggestionInfo> resl=suggestionResult.getAllSuggestions();
+                final List<SuggestionResult.SuggestionInfo> resl=suggestionResult.getAllSuggestions();
                 sugAdapter=new SugAdapter(resl);
                 recyclerView.setAdapter(sugAdapter);
                 sugAdapter.notifyDataSetChanged();
-             /*   for(int i=0;i<resl.size();i++)
+               /* for(int i=0;i<resl.size();i++)
                 {
-                    Log.i("result: ","city"+resl.get(i).city+" dis "+resl.get(i).district+"key "+resl.get(i).key);
+                    Log.i("result: ","Tag"+resl.get(i).getTag()+"city"+resl.get(i).city+" dis "+resl.get(i).district+"key "+resl.get(i).key);
 
                 }*/
+                sugAdapter.setOnItemClickListener(new SugAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        baiduMap.clear();
+                        SuggestionResult.SuggestionInfo suggestionInfo=resl.get(position);
+                        Toast.makeText(SearchActivity.this,suggestionInfo.getUid(),Toast.LENGTH_SHORT).show();
+                        //mPoiSearch.searchPoiDetail(new PoiDetailSearchOption().poiUid(suggestionInfo.getUid()));
+                        baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(suggestionInfo.getPt()));
+                        BitmapDescriptor bitmap = BitmapDescriptorFactory
+                                .fromResource(R.drawable.icon_mark);
+//构建MarkerOption，用于在地图上添加Marker
+                        OverlayOptions option = new MarkerOptions()
+                                .position(suggestionInfo.getPt())
+                                .icon(bitmap);
+                       // Bundle bundle = new Bundle();
+                        //info必须实现序列化接口
+                       // bundle.putParcelable("info", p);
+                        //在地图上添加Marker，并显示
+                        baiduMap.addOverlay(option);
+                        recyclerView.setVisibility(View.GONE);
 
+
+                    }
+                });
             }
+
             //获取在线建议检索结果
         }
 
