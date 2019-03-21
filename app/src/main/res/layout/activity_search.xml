@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SearchActivity">
+    tools:context=".activity.SearchActivity">
   <android.support.v7.widget.Toolbar
       android:id="@+id/search_toolBar"
       android:layout_width="match_parent"
@@ -20,10 +20,190 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
   </android.support.v7.widget.RecyclerView>
-  <!--<com.baidu.mapapi.map.MapView
-      android:id="@+id/searchbmapview"
+  <LinearLayout
       android:layout_width="match_parent"
-      android:layout_height="300dp"
-      android:clickable="true"
-      />-->
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:orientation="vertical">
+    <ImageView
+        android:id="@+id/search_food"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:src="@drawable/search_icon_food"
+        />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="美食"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_hotel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_hotel"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="酒店"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_bus"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_bus"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="公交站"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_bank"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_bank"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="银行"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+  </LinearLayout>
+
+ <!-- /////////////////上下两行图标分界////////////////-->
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:orientation="vertical">
+      <ImageView
+          android:id="@+id/search_gasstation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_gasstation"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="加油站"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_view"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_view"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="景点"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_ktv"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_ktv"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="KTV"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        >
+      <ImageView
+          android:id="@+id/search_supermarket"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="10dp"
+          android:src="@drawable/search_icon_supermarket"
+          />
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="超市"
+          android:layout_gravity="center"
+          />
+    </LinearLayout>
+
+  </LinearLayout>
+  <View
+      android:layout_width="match_parent"
+      android:layout_height="1.5dp"
+      android:layout_marginTop="10dp"
+      android:background="#e3e7f1"/>
 </LinearLayout>

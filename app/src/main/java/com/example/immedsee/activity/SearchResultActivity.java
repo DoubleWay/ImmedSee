@@ -1,8 +1,11 @@
-package com.example.immedsee;
+package com.example.immedsee.activity;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -23,9 +26,12 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.PoiDetailInfo;
 import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
+import com.baidu.mapapi.search.poi.PoiCitySearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailResult;
+import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
 import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
 import com.baidu.mapapi.search.poi.PoiIndoorResult;
 import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
@@ -34,8 +40,11 @@ import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
+import com.example.immedsee.R;
+import com.example.immedsee.adapter.SearchResultAdapter;
 import com.example.immedsee.adapter.SugAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchResultActivity extends AppCompatActivity {
@@ -47,7 +56,7 @@ public class SearchResultActivity extends AppCompatActivity {
     public LocationClient mLocationClient;
     private MapView mapView;
     private BaiduMap baiduMap;
-    private boolean isFirstLocate=true;
+    public boolean isFirstLocate=true;
     private BDLocation mcurrentLoction;
     private LatLng mLatLng;
     private PoiSearch mPoiSearch;
@@ -55,7 +64,12 @@ public class SearchResultActivity extends AppCompatActivity {
     private String Query;
     private  double mLatitude;
     private  double mLongitude;
+    private  String mLocationUid;
     private LatLng LL;
+    private FloatingActionButton floatSearchResult;
+    private RecyclerView recyclerView;
+    private SearchResultAdapter resultAdapter;
+    private boolean isFirstAdapter=true; //判断是不是第一次加载recyview
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +77,7 @@ public class SearchResultActivity extends AppCompatActivity {
         mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_search_result);
-
+        floatSearchResult=(FloatingActionButton)findViewById(R.id.fab_sreach_resuit);
         mapView=(MapView)findViewById(R.id.searchbmapview);
         //移除百度地图LOGO
         mapView.removeViewAt(1);
@@ -73,8 +87,11 @@ public class SearchResultActivity extends AppCompatActivity {
         mPoiSearch= PoiSearch.newInstance();
         mPoiSearch.setOnGetPoiSearchResultListener(poiSearchResultListener);//设置POI检索监听器
 
-        mSuggestionSearch = SuggestionSearch.newInstance();
+        //mSuggestionSearch = SuggestionSearch.newInstance();
        // mSuggestionSearch.setOnGetSuggestionResultListener(suggestionResultListener);//创建Sug搜索监听器
+        recyclerView=(RecyclerView)findViewById(R.id.search_result_list);
+        GridLayoutManager layoutManager=new GridLayoutManager(getApplicationContext(),1);
+        recyclerView.setLayoutManager(layoutManager);
 
         Intent intent=getIntent();
         Query=intent.getStringExtra("Query");
@@ -82,6 +99,7 @@ public class SearchResultActivity extends AppCompatActivity {
         Log.d("this", "Latitude: "+mLatitude);
         mLongitude=intent.getDoubleExtra("Longitude",0);
         Log.d("this", "Longitude: "+mLongitude);
+        mLocationUid=intent.getStringExtra("locationUid");
 
         /**
          * 这里判断模糊搜索传过来经纬度的是不是0
@@ -93,8 +111,26 @@ public class SearchResultActivity extends AppCompatActivity {
               requestLocation();
           }else {
               LL = new LatLng(mLatitude, mLongitude);
+            /**
+             * 根据模糊搜索传来的UID进行poi详情搜索
+             */
+            mPoiSearch.searchPoiDetail((new PoiDetailSearchOption())
+                    .poiUids(mLocationUid));
               marker();
           }
+
+        floatSearchResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLocation();
+                LatLng moveToLocation=new LatLng(mCurrentLatitude,mCurrentLongitude);
+                MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(moveToLocation);
+                baiduMap.animateMapStatus(update);
+                update=MapStatusUpdateFactory.zoomTo(19f);
+                baiduMap.animateMapStatus(update);
+
+            }
+        });
     }
 
     private void requestLocation() {
@@ -126,7 +162,7 @@ public class SearchResultActivity extends AppCompatActivity {
             LatLng ll=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
             MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
-            update=MapStatusUpdateFactory.zoomTo(19f);
+            update=MapStatusUpdateFactory.zoomTo(17f);
             baiduMap.animateMapStatus(update);
             isFirstLocate=false;
         }
@@ -166,21 +202,25 @@ public class SearchResultActivity extends AppCompatActivity {
         // bundle.putParcelable("info", p);
         //在地图上添加Marker，并显示
         baiduMap.addOverlay(option);
-
         baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(LL));
     }
 
-
+//POI搜索监听
     OnGetPoiSearchResultListener poiSearchResultListener=new OnGetPoiSearchResultListener() {
         @Override
         public void onGetPoiResult(PoiResult poiResult) {
             //使用clear来清除所有覆盖物
             baiduMap.clear();
-            if(poiResult.getAllPoi() != null)
-                mLatLng=poiResult.getAllPoi().get(0).location;
-
             if (poiResult.getAllPoi() != null) {
+                //mLatLng=poiResult.getAllPoi().get(0).location;
                 List<PoiInfo> mData = poiResult.getAllPoi();
+                if(isFirstAdapter) {
+                    resultAdapter = new SearchResultAdapter(mData);
+                    recyclerView.setAdapter(resultAdapter);
+                    Log.d("SearchResultActivuty", "onGetPoiResult: ");
+                    resultAdapter.notifyDataSetChanged();
+                    isFirstAdapter=false;
+                }
                 //定义Maker坐标点
                 for (PoiInfo p : mData) {
                     LatLng point = new LatLng(p.location.latitude, p.location.longitude);
@@ -197,7 +237,7 @@ public class SearchResultActivity extends AppCompatActivity {
                     //在地图上添加Marker，并显示
                     baiduMap.addOverlay(option).setExtraInfo(bundle);
                     //设置搜索到的第一条结果为地图的中心
-                   // baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mLatLng));
+                 //  baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mLatLng));
                 }
 
 
@@ -211,6 +251,20 @@ public class SearchResultActivity extends AppCompatActivity {
 
         @Override
         public void onGetPoiDetailResult(PoiDetailSearchResult poiDetailSearchResult) {
+            /**
+             * 在这里对详情搜索的结果进行处理，构造一个PoiInfo对象，将搜索带来的数据赋予这个对象
+             * 然后将PoiInfo对象加入List，然后传入适配器，显示在recyview中
+             */
+              PoiInfo poiInfo=new PoiInfo();
+              poiInfo.setCity(poiDetailSearchResult.getPoiDetailInfoList().get(0).getCity());
+              poiInfo.setAddress(poiDetailSearchResult.getPoiDetailInfoList().get(0).getAddress());
+              poiInfo.setName(poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
+               List<PoiInfo> mData=new ArrayList<>();
+              mData.add(poiInfo);
+              resultAdapter=new SearchResultAdapter(mData);
+              recyclerView.setAdapter(resultAdapter);
+              resultAdapter.notifyDataSetChanged();
+
         }
 
         @Override

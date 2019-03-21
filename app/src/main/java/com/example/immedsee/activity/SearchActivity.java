@@ -1,12 +1,7 @@
-package com.example.immedsee;
+package com.example.immedsee.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,52 +15,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageView;
 
-import com.baidu.location.BDAbstractLocationListener;
-import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
-import com.baidu.mapapi.SDKInitializer;
-import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
-import com.baidu.mapapi.map.MapStatusUpdate;
-import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationConfiguration;
-import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.search.core.PoiInfo;
-import com.baidu.mapapi.search.poi.OnGetPoiSearchResultListener;
-import com.baidu.mapapi.search.poi.PoiDetailResult;
-import com.baidu.mapapi.search.poi.PoiDetailSearchOption;
-import com.baidu.mapapi.search.poi.PoiDetailSearchResult;
-import com.baidu.mapapi.search.poi.PoiIndoorResult;
-import com.baidu.mapapi.search.poi.PoiNearbySearchOption;
-import com.baidu.mapapi.search.poi.PoiResult;
-import com.baidu.mapapi.search.poi.PoiSearch;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
+import com.example.immedsee.R;
 import com.example.immedsee.adapter.SugAdapter;
-import com.example.immedsee.fragment.FragmentOne;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity  implements View.OnClickListener{
     private String locationCity;
     private SearchView mSearchView;
     private SuggestionSearch mSuggestionSearch;
     private SugAdapter sugAdapter;
     private RecyclerView recyclerView;
     private List<SuggestionResult.SuggestionInfo> SuggestionInfoList;
+    private ImageView imageViewFood;
+    private ImageView imageViewHotel;
+    private ImageView imageViewBus;
+    private ImageView imageViewBank;
+    private ImageView imageViewGass;
+    private ImageView imageViewView;
+    private ImageView imageViewKTV;
+    private ImageView imageViewSupermaket;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +50,7 @@ public class SearchActivity extends AppCompatActivity {
         recyclerView=(RecyclerView)findViewById(R.id.suggest_search_list);
         GridLayoutManager layoutManager=new GridLayoutManager(getApplicationContext(),1);
         recyclerView.setLayoutManager(layoutManager);
+
         mSuggestionSearch = SuggestionSearch.newInstance();
         mSuggestionSearch.setOnGetSuggestionResultListener(suggestionResultListener);//创建Sug搜索监听器
 
@@ -86,7 +63,23 @@ public class SearchActivity extends AppCompatActivity {
         Intent intent=getIntent();
         locationCity=intent.getStringExtra("LoctionCity");
         Log.d("this", "onCreate: "+locationCity);
+        imageViewFood=(ImageView)findViewById(R.id.search_food);
+        imageViewHotel=(ImageView)findViewById(R.id.search_hotel);
+        imageViewBus=(ImageView)findViewById(R.id.search_bus);
+        imageViewBank=(ImageView)findViewById(R.id.search_bank);
+        imageViewGass=(ImageView)findViewById(R.id.search_gasstation);
+        imageViewView=(ImageView)findViewById(R.id.search_view);
+        imageViewKTV=(ImageView)findViewById(R.id.search_ktv);
+        imageViewSupermaket=(ImageView)findViewById(R.id.search_supermarket);
 
+        imageViewFood.setOnClickListener(this);
+        imageViewHotel.setOnClickListener(this);
+        imageViewBus.setOnClickListener(this);
+        imageViewBank.setOnClickListener(this);
+        imageViewGass.setOnClickListener(this);
+        imageViewView.setOnClickListener(this);
+        imageViewKTV.setOnClickListener(this);
+        imageViewSupermaket.setOnClickListener(this);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -153,6 +146,7 @@ public class SearchActivity extends AppCompatActivity {
                             Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
                             intent.putExtra("Latitude",suggestionInfo.getPt().latitude);
                             intent.putExtra("Longitude",suggestionInfo.getPt().longitude);
+                            intent.putExtra("locationUid",suggestionInfo.getUid());
                             startActivity(intent);
                             recyclerView.setVisibility(View.GONE);
                         }
@@ -178,4 +172,51 @@ public class SearchActivity extends AppCompatActivity {
         return  true;
     }
 
+    @Override
+    public void onClick(View view) {
+         switch (view.getId()){
+             case R.id.search_food:
+                 Intent intentFood=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentFood.putExtra("Query","美食");
+                 startActivity(intentFood);
+              break;
+             case R.id.search_hotel:
+                 Intent intentHotel=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentHotel.putExtra("Query","酒店");
+                 startActivity(intentHotel);
+                 break;
+             case R.id.search_bus:
+                 Intent intentBus=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentBus.putExtra("Query","公交站");
+                 startActivity(intentBus);
+                 break;
+             case R.id.search_bank:
+                 Intent intentBank=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentBank.putExtra("Query","银行");
+                 startActivity(intentBank);
+                 break;
+             case R.id.search_gasstation:
+                 Intent intentGass=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentGass.putExtra("Query","加油站");
+                 startActivity(intentGass);
+                 break;
+             case R.id.search_view:
+                 Intent intentView=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentView.putExtra("Query","景点");
+                 startActivity(intentView);
+                 break;
+             case R.id.search_ktv:
+                 Intent intentKtv=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentKtv.putExtra("Query","KTV");
+                 startActivity(intentKtv);
+                 break;
+             case R.id.search_supermarket:
+                 Intent intentsupermarket=new Intent(SearchActivity.this,SearchResultActivity.class);
+                 intentsupermarket.putExtra("Query","超市");
+                 startActivity(intentsupermarket);
+                 break;
+              default:
+                  break;
+         }
+    }
 }

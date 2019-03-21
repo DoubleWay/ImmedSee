@@ -28,7 +28,7 @@
             android:value="5Gpre6r15yUEv2Cl26Ayj7saWT7RGIvo" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="即视" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,14 +44,14 @@
 
         <!-- activity作为欢迎页 -->
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".activity.WelcomeActivity"
             android:theme="@style/AppWelcome">
 
         </activity>
-        <activity android:name=".SearchActivity">
+        <activity android:name=".activity.SearchActivity">
 
         </activity>
-        <activity android:name=".SearchResultActivity"></activity>
+        <activity android:name=".activity.SearchResultActivity"></activity>
     </application>
 
 </manifest>

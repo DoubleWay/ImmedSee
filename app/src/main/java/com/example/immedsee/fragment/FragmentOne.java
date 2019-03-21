@@ -36,9 +36,8 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.utils.CoordinateConverter;
 import com.example.immedsee.R;
-import com.example.immedsee.SearchActivity;
+import com.example.immedsee.activity.SearchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +124,7 @@ public class FragmentOne extends Fragment {
         //移除百度地图LOGO
         mapView.removeViewAt(1);
         baiduMap=mapView.getMap();
-        baiduMap.setTrafficEnabled(true);
+       // baiduMap.setTrafficEnabled(true);
         baiduMap.setMyLocationEnabled(true);
         /**
          * 开启方向传感器
@@ -267,7 +266,7 @@ public class FragmentOne extends Fragment {
                         baiduMap.setMyLocationData(locData);
                         // 设置自定义图标
                         BitmapDescriptor mCurrentMarker = BitmapDescriptorFactory
-                                .fromResource(R.drawable.map_icon);
+                                .fromResource(R.drawable.arrow);
                         MyLocationConfiguration configuration=new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker);
                         baiduMap.setMyLocationConfiguration(configuration);
 
@@ -309,14 +308,9 @@ public class FragmentOne extends Fragment {
     private void navigateTo(BDLocation bdLocation) {
         if(isFirstLocate){
             LatLng ll=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
-
-            /*CoordinateConverter converter = new CoordinateConverter();
-            converter.from(CoordinateConverter.CoordType.GPS);
-            converter.coord(ll);
-            LatLng llChange=converter.convert();*/
             MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(ll);
             baiduMap.animateMapStatus(update);
-            update=MapStatusUpdateFactory.zoomTo(19f);
+            update=MapStatusUpdateFactory.zoomTo(17f);
             baiduMap.animateMapStatus(update);
            isFirstLocate=false;
         }

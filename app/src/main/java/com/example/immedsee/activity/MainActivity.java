@@ -1,4 +1,4 @@
-package com.example.immedsee;
+package com.example.immedsee.activity;
 
 
 
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 
 import com.baidu.location.LocationClient;
+import com.example.immedsee.R;
 import com.example.immedsee.fragment.FragmentOne;
 import com.example.immedsee.fragment.FragmentThree;
 import com.example.immedsee.fragment.FragmentTwo;
