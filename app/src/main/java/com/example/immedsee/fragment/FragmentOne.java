@@ -12,13 +12,16 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,12 +33,21 @@ import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.example.immedsee.R;
 import com.example.immedsee.activity.SearchActivity;
 
@@ -46,7 +58,7 @@ import java.util.List;
  * DoubleWay on 2019/2/15:16:23
  * 邮箱：13558965844@163.com
  */
-public class FragmentOne extends Fragment {
+public class FragmentOne extends Fragment{
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
     public MyOrientationListener myOrientationListener;
     private int mXDirection;
@@ -61,6 +73,11 @@ public class FragmentOne extends Fragment {
     private BaiduMap baiduMap;
     private CardView searchCardView;
     public boolean isFirstLocate=true;
+    private Marker marker;
+    private BitmapDescriptor bd;
+
+    /*private GeoCoder mSearch = null;*/
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +88,9 @@ public class FragmentOne extends Fragment {
          */
         initOritationListener();
         SDKInitializer.initialize(getActivity().getApplicationContext());
+        /*mSearch = GeoCoder.newInstance();
+        mSearch.setOnGetGeoCodeResultListener(this);*/
+        bd = BitmapDescriptorFactory.fromResource(R.drawable.map_long_click_mark);
         List<String> permissionList=new ArrayList<>();
         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                 .ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
@@ -120,12 +140,17 @@ public class FragmentOne extends Fragment {
                 startActivity(intent);
             }
         });
+
+
         mapView=getView().findViewById(R.id.bmapview);
         //移除百度地图LOGO
         mapView.removeViewAt(1);
         baiduMap=mapView.getMap();
        // baiduMap.setTrafficEnabled(true);
         baiduMap.setMyLocationEnabled(true);
+        baiduMap.setOnMapLongClickListener(mapLongClickListener);//设置长按地图事件监听
+        baiduMap.setOnMarkerClickListener(markerClickListener);//设置marker点击事件监听
+        baiduMap.setOnMapClickListener(mapClickListener);//设置地图点击事件监听
         /**
          * 开启方向传感器
          */
@@ -168,6 +193,20 @@ public class FragmentOne extends Fragment {
                 break;
         }
     }
+/*
+    @Override
+    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+        Log.d("this", "地理编码信息 ---> \nAddress : " + geoCodeResult.getAddress()
+                + "\ntoString : " + geoCodeResult.toString()
+                + "\ndescribeContents : " + geoCodeResult.describeContents());
+    }
+
+    @Override
+    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+        Log.d("that", "地理编码信息 "+reverseGeoCodeResult.getAddress());
+
+    }*/
+
     public class MyOrientationListener implements SensorEventListener{
         private Context context;
         private SensorManager sensorManager;
@@ -335,6 +374,87 @@ public class FragmentOne extends Fragment {
       /*  baiduMap.setMyLocationConfiguration(configuration);*/
     }
 
+    /**
+     * 地图点击事件监听接口
+     */
+    BaiduMap.OnMapClickListener mapClickListener=new BaiduMap.OnMapClickListener() {
+        @Override
+        public void onMapClick(LatLng latLng) {
+               baiduMap.hideInfoWindow();
+        }
+
+        @Override
+        public boolean onMapPoiClick(MapPoi mapPoi) {
+            return false;
+        }
+    };
+
+
+
+    /**
+     * 地图长按事件监听接口，地图长按添加图标
+     */
+    BaiduMap.OnMapLongClickListener mapLongClickListener=new BaiduMap.OnMapLongClickListener() {
+        @Override
+        public void onMapLongClick(LatLng latLng) {
+            baiduMap.clear();
+            //Toast.makeText(getActivity().getApplicationContext(),"地图长按",Toast.LENGTH_SHORT).show();
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(latLng)//mark出现的位置
+                    .icon(bd)       //mark图标
+                    .draggable(true)//mark可拖拽
+                    //.animateType(MarkerOptions.MarkerAnimateType.drop)//从天而降的方式
+                    .animateType(MarkerOptions.MarkerAnimateType.grow)//从地生长的方式
+                    ;
+            //添加mark
+            marker = (Marker) (baiduMap.addOverlay(markerOptions));//地图上添加mark
+
+        }
+    };
+
+    /**
+     * 点击marker显示infowindow窗口信息
+     */
+    BaiduMap.OnMarkerClickListener markerClickListener=new BaiduMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+             final LatLng markerLaLng=marker.getPosition();
+
+            /*mSearch.reverseGeoCode(new ReverseGeoCodeOption()
+                    .location(markerLaLng));*/
+            //实例化一个地理编码查询对象
+            GeoCoder geoCoder = GeoCoder.newInstance();
+            //设置反地理编码位置坐标
+            ReverseGeoCodeOption option = new ReverseGeoCodeOption();
+            option.location(markerLaLng);
+            geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+                @Override
+                public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+                }
+                @Override
+                public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                    ReverseGeoCodeResult.AddressComponent addressDetail = reverseGeoCodeResult.getAddressDetail();
+                    View view=View.inflate(getActivity().getApplicationContext(),R.layout.infowindow,null);
+                    TextView agentName=(TextView)view.findViewById(R.id.agent_name);
+                    TextView agentAaddr=(TextView)view.findViewById(R.id.agent_addr);
+                    agentName.setText(addressDetail.city);
+                    agentAaddr.setText(reverseGeoCodeResult.getAddress());
+                    InfoWindow infoWindow=new InfoWindow(view,markerLaLng,-60);
+                    //InfoWindow infoWindow = new InfoWindow(button, latLng, -47);
+                    //显示信息窗口
+                    baiduMap.showInfoWindow(infoWindow);
+                    Log.d("that", "反地理编码信息 "+reverseGeoCodeResult.getAddress());
+                }
+            });
+
+            geoCoder.reverseGeoCode(option);
+
+            //Toast.makeText(getActivity().getApplicationContext(),markerLaLng.toString(),Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    };
+
 
     @Override
     public void onResume() {
@@ -364,6 +484,5 @@ public class FragmentOne extends Fragment {
         mapView.onDestroy();
         baiduMap.setMyLocationEnabled(false);
     }
-
 
 }

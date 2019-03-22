@@ -114,6 +114,7 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
                 mSuggestionSearch.requestSuggestion(new SuggestionSearchOption()
                         .city(locationCity)
                         .keyword(newText));
+
                 //模糊搜索
                 return false;
             }

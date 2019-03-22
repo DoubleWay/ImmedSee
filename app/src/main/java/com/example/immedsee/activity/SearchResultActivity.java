@@ -182,7 +182,7 @@ public class SearchResultActivity extends AppCompatActivity {
         baiduMap.setMyLocationData(myLocationData);
       //  Log.d("this", "navigateTo: "+mCurrentLatitude+" "+mCurrentLongitude);
 
-        mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(10)).radius(1000)
+        mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(20)).radius(1000)
                 .location(new LatLng(mcurrentLoction.getLatitude(),mcurrentLoction.getLongitude()))
                 .keyword(Query));
 
@@ -214,6 +214,8 @@ public class SearchResultActivity extends AppCompatActivity {
             if (poiResult.getAllPoi() != null) {
                 //mLatLng=poiResult.getAllPoi().get(0).location;
                 List<PoiInfo> mData = poiResult.getAllPoi();
+
+                Log.d("number", "onGetPoiResult: "+mData.size());
                 if(isFirstAdapter) {
                     resultAdapter = new SearchResultAdapter(mData);
                     recyclerView.setAdapter(resultAdapter);
