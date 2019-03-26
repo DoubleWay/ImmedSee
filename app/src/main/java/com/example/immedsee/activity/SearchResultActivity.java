@@ -297,7 +297,9 @@ public class SearchResultActivity extends AppCompatActivity {
                     resultAdapter.notifyDataSetChanged();
                     isFirstAdapter=false;
                 }
-
+                /**
+                 * poi搜索结果列表点击事件
+                 */
                 resultAdapter.setOnItemClickListener(new SearchResultAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
@@ -305,6 +307,10 @@ public class SearchResultActivity extends AppCompatActivity {
                         Intent toResultDetails=new Intent(getApplicationContext(),ResultDetailsActivity.class);
                         toResultDetails.putExtra("ResultName",info.getName());
                         toResultDetails.putExtra("ResultUid",info.getUid());
+                        toResultDetails.putExtra("ReaultLongitude",info.getLocation().longitude);
+                        toResultDetails.putExtra("ReaultLatitude",info.getLocation().latitude);
+
+
                         startActivity(toResultDetails);
                     }
                 });
@@ -341,7 +347,7 @@ public class SearchResultActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onGetPoiDetailResult(PoiDetailSearchResult poiDetailSearchResult) {
+        public void onGetPoiDetailResult(final PoiDetailSearchResult poiDetailSearchResult) {
             /**
              * 在这里对详情搜索的结果进行处理，构造一个PoiInfo对象，将搜索带来的数据赋予这个对象
              * 然后将PoiInfo对象加入List，然后传入适配器，显示在recyview中
@@ -360,6 +366,10 @@ public class SearchResultActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(View view, int position) {
                     Intent toResultDetails=new Intent(getApplicationContext(),ResultDetailsActivity.class);
+                    toResultDetails.putExtra("ResultName",poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
+                    toResultDetails.putExtra("ResultUid",poiDetailSearchResult.getPoiDetailInfoList().get(0).getUid());
+                    toResultDetails.putExtra("ReaultLongitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().longitude);
+                    toResultDetails.putExtra("ReaultLatitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().latitude);
                     startActivity(toResultDetails);
 
                 }

@@ -49,7 +49,7 @@ public class SugAdapter extends RecyclerView.Adapter<SugAdapter.ViewHolder>{
             mContext=parent.getContext();
         }
         View view= LayoutInflater.from(mContext).inflate(R.layout.suggest_search_result_item,parent,false);
-
+    
         return new ViewHolder(view);
     }
 
