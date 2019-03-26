@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
@@ -45,6 +46,7 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_search);
        //创建显示模糊搜索结果的列表
         recyclerView=(RecyclerView)findViewById(R.id.suggest_search_list);
@@ -148,6 +150,7 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
                             intent.putExtra("Latitude",suggestionInfo.getPt().latitude);
                             intent.putExtra("Longitude",suggestionInfo.getPt().longitude);
                             intent.putExtra("locationUid",suggestionInfo.getUid());
+                            intent.putExtra("SuggestKey",suggestionInfo.key);
                             startActivity(intent);
                             recyclerView.setVisibility(View.GONE);
                         }

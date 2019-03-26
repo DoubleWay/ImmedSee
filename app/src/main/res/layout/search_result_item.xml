@@ -5,14 +5,15 @@
     android:layout_height="80dp"
     android:layout_marginBottom="1dp"
     >
+
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_width="310dp"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/search_result_name"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
@@ -24,14 +25,39 @@
             />
         <TextView
             android:id="@+id/search_result_address"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:singleLine="true"
+            android:singleLine="false"
             android:textStyle="italic"
             android:text="1234"
             android:textSize="12dp"
             />
 
     </LinearLayout>
+
+   <!-- <View
+        android:layout_width="1dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="310dp"
+        android:background="#000" />-->
+    <ImageView
+        android:id="@+id/search_result_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="315dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/search_result_details" />
+
+   <!-- <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="详情"
+        android:textStyle="italic"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="320dp"
+        />-->
 </android.support.v7.widget.CardView>

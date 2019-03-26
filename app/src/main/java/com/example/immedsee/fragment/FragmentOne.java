@@ -74,7 +74,7 @@ public class FragmentOne extends Fragment{
     private CardView searchCardView;
     public boolean isFirstLocate=true;
     private Marker marker;
-    private BitmapDescriptor bd;
+    private BitmapDescriptor bd; //加载标注物的图片
 
     /*private GeoCoder mSearch = null;*/
 
@@ -120,6 +120,10 @@ public class FragmentOne extends Fragment{
     }
     @Override
     public void onStart() {
+        /**
+         * 当从别的活动返回时 重新启动定位
+         */
+        mLocationClient.start();
         floatingActionButton=getView().findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +141,7 @@ public class FragmentOne extends Fragment{
             public void onClick(View view) {
                 Intent  intent=new Intent(getActivity().getApplicationContext(), SearchActivity.class);
                intent.putExtra("LoctionCity",mCurrentLoction.getCity());
+               // mLocationClient.stop();
                 startActivity(intent);
             }
         });
@@ -193,19 +198,6 @@ public class FragmentOne extends Fragment{
                 break;
         }
     }
-/*
-    @Override
-    public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
-        Log.d("this", "地理编码信息 ---> \nAddress : " + geoCodeResult.getAddress()
-                + "\ntoString : " + geoCodeResult.toString()
-                + "\ndescribeContents : " + geoCodeResult.describeContents());
-    }
-
-    @Override
-    public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-        Log.d("that", "地理编码信息 "+reverseGeoCodeResult.getAddress());
-
-    }*/
 
     public class MyOrientationListener implements SensorEventListener{
         private Context context;
@@ -456,6 +448,7 @@ public class FragmentOne extends Fragment{
     };
 
 
+
     @Override
     public void onResume() {
         super.onResume();
@@ -474,13 +467,16 @@ public class FragmentOne extends Fragment{
          * 关闭方向传感器
          */
         myOrientationListener.stop();
+        /**
+         * 当从当前跳转到另一个活动的时候停止定位
+         */
+        mLocationClient.stop();
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLocationClient.stop();
         mapView.onDestroy();
         baiduMap.setMyLocationEnabled(false);
     }

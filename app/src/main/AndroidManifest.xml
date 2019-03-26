@@ -29,7 +29,7 @@
 
         <activity
             android:name=".activity.MainActivity"
-            android:label="即视" >
+            android:label="即视">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,13 +45,10 @@
         <!-- activity作为欢迎页 -->
         <activity
             android:name=".activity.WelcomeActivity"
-            android:theme="@style/AppWelcome">
-
-        </activity>
-        <activity android:name=".activity.SearchActivity">
-
-        </activity>
-        <activity android:name=".activity.SearchResultActivity"></activity>
+            android:theme="@style/AppWelcome"></activity>
+        <activity android:name=".activity.SearchActivity"></activity>
+        <activity android:name=".activity.SearchResultActivity" />
+        <activity android:name=".activity.ResultDetailsActivity"></activity>
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baidu.mapapi.search.core.PoiInfo;
@@ -21,18 +22,20 @@ import java.util.List;
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> {
         private Context mContext;
         private List<PoiInfo> mPoiInfo;
-
+        private OnItemClickListener mOnItemClickListener;
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         TextView resultName;
         TextView resultAddress;
+        ImageView imageViewDetails;
 
         public ViewHolder(View view){
             super(view);
             cardView=(CardView)view;
             resultName=(TextView)view.findViewById(R.id.search_result_name);
             resultAddress=(TextView)view.findViewById(R.id.search_result_address);
+            imageViewDetails=(ImageView)view.findViewById(R.id.search_result_details);
         }
     }
 
@@ -52,10 +55,19 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         PoiInfo info=mPoiInfo.get(position);
         holder.resultName.setText(info.getName());
         holder.resultAddress.setText(info.getAddress());
+        if(mOnItemClickListener!=null){
+            holder.imageViewDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = holder.getLayoutPosition();
+                    mOnItemClickListener.onItemClick(holder.cardView, position);
+                }
+            });
+        }
     }
 
     @Override
@@ -63,5 +75,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         return mPoiInfo.size();
     }
 
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        mOnItemClickListener=onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
 }

@@ -9,13 +9,13 @@
     <com.baidu.mapapi.map.MapView
         android:id="@+id/searchbmapview"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="340dp"
         android:clickable="true"
         />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1.5dp"
+        android:layout_height="1dp"
         android:layout_alignBottom="@+id/searchbmapview"
         android:layout_alignParentStart="true"
         android:background="#000" />
@@ -32,12 +32,37 @@
         app:fabSize="mini"
         app:rippleColor="#32dbc6" />
 
+    <TextView
+        android:id="@+id/poi_page"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignParentStart="true"
+        android:gravity="center"
+        android:layout_below="@+id/searchbmapview"
+        android:text="向下刷新加载下一页"
+        android:textStyle="italic"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignBottom="@+id/poi_page"
+        android:layout_alignParentStart="true"
+        android:background="#000" />
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/swip_refresh"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/poi_page"
+    android:layout_alignParentStart="true"
+    >
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_result_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/searchbmapview">
+
+        >
 
     </android.support.v7.widget.RecyclerView>
+</android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>
