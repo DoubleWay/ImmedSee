@@ -71,6 +71,7 @@
                     android:src="@drawable/inforwindow_navigation" />
 
                 <TextView
+                    android:id="@+id/navigation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -87,7 +88,7 @@
                 android:background="#DFDFDF" />
 
             <LinearLayout
-                android:id="@+id/call_LL"
+                android:id="@+id/details_LL"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="9dp"
@@ -101,6 +102,7 @@
                     android:src="@drawable/inforwindow_details" />
 
                 <TextView
+                    android:id="@+id/details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"

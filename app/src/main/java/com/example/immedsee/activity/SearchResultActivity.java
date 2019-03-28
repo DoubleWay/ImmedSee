@@ -64,6 +64,8 @@ public class SearchResultActivity extends AppCompatActivity {
     private float mCurrentAccracy;
     private double mCurrentLatitude;
     private double mCurrentLongitude;
+    private double resultLocationLongitude;
+    private double resultLocationLatitude;
     public LocationClient mLocationClient;
     private MapView mapView;
     private BaiduMap baiduMap;
@@ -84,7 +86,7 @@ public class SearchResultActivity extends AppCompatActivity {
     private PoiResult mPoiResult;
     private GridLayoutManager layoutManager;
     private Marker marker;
-    private ImageView imageViewDetails;
+    private String []markerResult=null; //装拆分后的marker的poi的name和uid
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +125,12 @@ public class SearchResultActivity extends AppCompatActivity {
         //Log.d("this", "Longitude: "+mLongitude);
         mLocationUid=intent.getStringExtra("locationUid");
         suggestKey=intent.getStringExtra("SuggestKey");
-        Log.d("this", "suggestKey: "+suggestKey);
+        resultLocationLatitude=intent.getDoubleExtra("ResultLocationLatitude",0);
+        resultLocationLongitude=intent.getDoubleExtra("ResultLocationLongitude",0);
+        Log.d("this", "SearchResultLongitude: "+resultLocationLongitude);
+        Log.d("this", "SearchResultLatitude: "+resultLocationLatitude);
+
+
 
         /**
          * 这里判断模糊搜索传过来经纬度的是不是0
@@ -146,7 +153,7 @@ public class SearchResultActivity extends AppCompatActivity {
                     if (currentPageNum < totalPageNum-1) {
                         isFirstAdapter = true;
                         mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum + 1)).radius(1000)
-                                .location(new LatLng(mcurrentLoction.getLatitude(), mcurrentLoction.getLongitude()))
+                                .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
                                 .keyword(Query));
                         swipeRefreshLayout.setRefreshing(false);
                        /* Toast.makeText(SearchResultActivity.this, "hhhh", Toast.LENGTH_SHORT).show();*/
@@ -179,7 +186,6 @@ public class SearchResultActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 requestLocation();
-
                 LatLng moveToLocation=new LatLng(mCurrentLatitude,mCurrentLongitude);
                 MapStatusUpdate update= MapStatusUpdateFactory.newLatLng(moveToLocation);
                 baiduMap.animateMapStatus(update);
@@ -249,10 +255,17 @@ public class SearchResultActivity extends AppCompatActivity {
          * 判断传入的是否是sug搜索的坐标
          * 如果不是就进行poi搜索
          * 如果是就进行定位和标注
+         * 然后判断是定位的周边搜索还是目标地点的周边搜索，然后决定坐标是否赋值
          */
+
+    if(resultLocationLatitude!=0&&resultLocationLongitude!=0){
+        mCurrentLatitude=resultLocationLatitude;
+        mCurrentLongitude=resultLocationLongitude;
+    }
+
         if(mLatitude==0&&mLongitude==0) {
             mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(20)).radius(1000)
-                    .location(new LatLng(mcurrentLoction.getLatitude(), mcurrentLoction.getLongitude()))
+                    .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
                     .keyword(Query));
         }
 
@@ -270,7 +283,10 @@ public class SearchResultActivity extends AppCompatActivity {
         baiduMap.addOverlay(option);
         baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(LL));
         marker=(Marker)( baiduMap.addOverlay(option));
-        marker.setTitle(suggestKey);
+        /**
+         * 将poi兴趣点的name和uid组合后通过marker的title传过去，然后在marker的点击事件中拆分分使用
+         */
+        marker.setTitle(suggestKey+" "+mLocationUid);
     }
 
 //POI搜索监听
@@ -291,7 +307,7 @@ public class SearchResultActivity extends AppCompatActivity {
                 final List<PoiInfo> mData = poiResult.getAllPoi();
 
                 if(isFirstAdapter) {
-                    resultAdapter = new SearchResultAdapter(mData);
+                    resultAdapter = new SearchResultAdapter(mData,new LatLng(mCurrentLatitude,mCurrentLongitude));
                     recyclerView.setAdapter(resultAdapter);
                     Log.d("SearchResultActivuty", "onGetPoiResult: ");
                     resultAdapter.notifyDataSetChanged();
@@ -307,6 +323,7 @@ public class SearchResultActivity extends AppCompatActivity {
                         Intent toResultDetails=new Intent(getApplicationContext(),ResultDetailsActivity.class);
                         toResultDetails.putExtra("ResultName",info.getName());
                         toResultDetails.putExtra("ResultUid",info.getUid());
+                        toResultDetails.putExtra("ResultCity",info.getCity());
                         toResultDetails.putExtra("ReaultLongitude",info.getLocation().longitude);
                         toResultDetails.putExtra("ReaultLatitude",info.getLocation().latitude);
 
@@ -332,9 +349,12 @@ public class SearchResultActivity extends AppCompatActivity {
                     baiduMap.addOverlay(option).setExtraInfo(bundle);
                     marker=(Marker)(baiduMap.addOverlay(option));
                     //将poi地点的名字设置为marker的titile 下面方便获取
-                    marker.setTitle(p.getName());
+                    marker.setTitle(p.getName()+" "+p.getUid());
+                    /**
+                     * 将poi兴趣点的name和uid组合后通过marker的title传过去，然后在marker的点击事件中拆分分使用
+                     */
                     //设置搜索到的第一条结果为地图的中心
-                 //  baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mLatLng));
+                  baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(mData.get(0).location));
                 }
 
 
@@ -356,9 +376,10 @@ public class SearchResultActivity extends AppCompatActivity {
               poiInfo.setCity(poiDetailSearchResult.getPoiDetailInfoList().get(0).getCity());
               poiInfo.setAddress(poiDetailSearchResult.getPoiDetailInfoList().get(0).getAddress());
               poiInfo.setName(poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
+              poiInfo.setLocation(poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation());
                List<PoiInfo> mData=new ArrayList<>();
               mData.add(poiInfo);
-              resultAdapter=new SearchResultAdapter(mData);
+              resultAdapter=new SearchResultAdapter(mData,new LatLng(mCurrentLatitude,mCurrentLongitude));
               recyclerView.setAdapter(resultAdapter);
               resultAdapter.notifyDataSetChanged();
 
@@ -368,6 +389,7 @@ public class SearchResultActivity extends AppCompatActivity {
                     Intent toResultDetails=new Intent(getApplicationContext(),ResultDetailsActivity.class);
                     toResultDetails.putExtra("ResultName",poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
                     toResultDetails.putExtra("ResultUid",poiDetailSearchResult.getPoiDetailInfoList().get(0).getUid());
+                    toResultDetails.putExtra("ResultCity",poiDetailSearchResult.getPoiDetailInfoList().get(0).getCity());
                     toResultDetails.putExtra("ReaultLongitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().longitude);
                     toResultDetails.putExtra("ReaultLatitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().latitude);
                     startActivity(toResultDetails);
@@ -447,7 +469,13 @@ public class SearchResultActivity extends AppCompatActivity {
       @Override
       public boolean onMarkerClick(final Marker marker) {
           final LatLng markerLaLng=marker.getPosition();
+          /**
+           * 将通过marker.title获得的poi兴趣点的name和uid拆分使用
+           */
 
+          markerResult=marker.getTitle().split(" ");
+          Log.d("that", "markerResult "+markerResult[0]);
+          Log.d("that", "markerResult "+markerResult[1]);
           //实例化一个地理编码查询对象
           GeoCoder geoCoder = GeoCoder.newInstance();
           //设置反地理编码位置坐标
@@ -460,16 +488,31 @@ public class SearchResultActivity extends AppCompatActivity {
               }
               @Override
               public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-                  ReverseGeoCodeResult.AddressComponent addressDetail = reverseGeoCodeResult.getAddressDetail();
+                  final ReverseGeoCodeResult.AddressComponent addressDetail = reverseGeoCodeResult.getAddressDetail();
                   View view=View.inflate(getApplicationContext(),R.layout.infowindow,null);
                   TextView agentName=(TextView)view.findViewById(R.id.agent_name);
                   TextView agentAaddr=(TextView)view.findViewById(R.id.agent_addr);
-                  agentName.setText(marker.getTitle());
+
+                  agentName.setText(markerResult[0]);
                   agentAaddr.setText(reverseGeoCodeResult.getAddress());
                   InfoWindow infoWindow=new InfoWindow(view,markerLaLng,-60);
+
                   //InfoWindow infoWindow = new InfoWindow(button, latLng, -47);
                   //显示信息窗口
                   baiduMap.showInfoWindow(infoWindow);
+                  TextView detailsText=(TextView) view.findViewById(R.id.details);
+                  detailsText.setOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View view) {
+                          Intent toResultDetails=new Intent(getApplicationContext(),ResultDetailsActivity.class);
+                          toResultDetails.putExtra("ResultName",markerResult[0]);
+                          toResultDetails.putExtra("ResultUid",markerResult[1]);
+                          toResultDetails.putExtra("ResultCity",addressDetail.city);
+                          toResultDetails.putExtra("ReaultLongitude",markerLaLng.longitude);
+                          toResultDetails.putExtra("ReaultLatitude",markerLaLng.latitude );
+                          startActivity(toResultDetails);
+                      }
+                  });
                   Log.d("that", "反地理编码信息 "+reverseGeoCodeResult.getAddress());
               }
           });
@@ -480,6 +523,7 @@ public class SearchResultActivity extends AppCompatActivity {
           return false;
       }
   };
+
 
     protected void onResume() {
         super.onResume();

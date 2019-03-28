@@ -33,6 +33,16 @@
             android:text="1234"
             android:textSize="12dp"
             />
+        <TextView
+            android:id="@+id/search_distance_address"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:singleLine="false"
+            android:textStyle="normal"
+
+            android:textSize="12dp"
+            />
 
     </LinearLayout>
 

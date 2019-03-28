@@ -29,6 +29,8 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity  implements View.OnClickListener{
     private String locationCity;
+    private double resultLocationLongitude;
+    private double resultLocationLatitude;
     private SearchView mSearchView;
     private SuggestionSearch mSuggestionSearch;
     private SugAdapter sugAdapter;
@@ -64,6 +66,14 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
 
         Intent intent=getIntent();
         locationCity=intent.getStringExtra("LoctionCity");
+        /**
+         * 接受目标地点周边搜索的坐标
+         */
+        resultLocationLatitude=intent.getDoubleExtra("ResultLocationLatitude",0);
+        resultLocationLongitude=intent.getDoubleExtra("ResultLocationLongitude",0);
+       /* Log.d("this", "SearchactivityLongitude: "+resultLocationLongitude);
+        Log.d("this", "SearchactivityLatitude: "+resultLocationLatitude);*/
+
         Log.d("this", "onCreate: "+locationCity);
         imageViewFood=(ImageView)findViewById(R.id.search_food);
         imageViewHotel=(ImageView)findViewById(R.id.search_hotel);
@@ -100,6 +110,11 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
             @Override
             public boolean onQueryTextSubmit(String query) {
                Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
+                /**
+                 * 将要进行周边搜索的目标地点坐标传给搜索页面
+                 */
+              intent.putExtra("ResultLocationLongitude",resultLocationLongitude);
+              intent.putExtra("ResultLocationLatitude",resultLocationLatitude);
                intent.putExtra("Query",query);
                startActivity(intent);
                 return true;
@@ -182,41 +197,57 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
              case R.id.search_food:
                  Intent intentFood=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentFood.putExtra("Query","美食");
+                 intentFood.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentFood.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentFood);
               break;
              case R.id.search_hotel:
                  Intent intentHotel=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentHotel.putExtra("Query","酒店");
+                 intentHotel.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentHotel.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentHotel);
                  break;
              case R.id.search_bus:
                  Intent intentBus=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentBus.putExtra("Query","公交站");
+                 intentBus.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentBus.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentBus);
                  break;
              case R.id.search_bank:
                  Intent intentBank=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentBank.putExtra("Query","银行");
+                 intentBank.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentBank.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentBank);
                  break;
              case R.id.search_gasstation:
                  Intent intentGass=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentGass.putExtra("Query","加油站");
+                 intentGass.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentGass.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentGass);
                  break;
              case R.id.search_view:
                  Intent intentView=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentView.putExtra("Query","景点");
+                 intentView.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentView.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentView);
                  break;
              case R.id.search_ktv:
                  Intent intentKtv=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentKtv.putExtra("Query","KTV");
+                 intentKtv.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentKtv.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentKtv);
                  break;
              case R.id.search_supermarket:
                  Intent intentsupermarket=new Intent(SearchActivity.this,SearchResultActivity.class);
                  intentsupermarket.putExtra("Query","超市");
+                 intentsupermarket.putExtra("ResultLocationLongitude",resultLocationLongitude);
+                 intentsupermarket.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentsupermarket);
                  break;
               default:
