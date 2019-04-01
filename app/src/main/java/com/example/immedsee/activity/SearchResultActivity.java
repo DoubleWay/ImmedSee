@@ -324,9 +324,10 @@ public class SearchResultActivity extends AppCompatActivity {
                         toResultDetails.putExtra("ResultName",info.getName());
                         toResultDetails.putExtra("ResultUid",info.getUid());
                         toResultDetails.putExtra("ResultCity",info.getCity());
-                        toResultDetails.putExtra("ReaultLongitude",info.getLocation().longitude);
-                        toResultDetails.putExtra("ReaultLatitude",info.getLocation().latitude);
-
+                        toResultDetails.putExtra("ResultLongitude",info.getLocation().longitude);
+                        toResultDetails.putExtra("ResultLatitude",info.getLocation().latitude);
+                        toResultDetails.putExtra("ResultAddress",info.getAddress());
+                        Log.d("SearchResultActivity", "onItemClick: "+info.getAddress());
 
                         startActivity(toResultDetails);
                     }
@@ -372,7 +373,7 @@ public class SearchResultActivity extends AppCompatActivity {
              * 在这里对详情搜索的结果进行处理，构造一个PoiInfo对象，将搜索带来的数据赋予这个对象
              * 然后将PoiInfo对象加入List，然后传入适配器，显示在recyview中
              */
-              PoiInfo poiInfo=new PoiInfo();
+              final PoiInfo poiInfo=new PoiInfo();
               poiInfo.setCity(poiDetailSearchResult.getPoiDetailInfoList().get(0).getCity());
               poiInfo.setAddress(poiDetailSearchResult.getPoiDetailInfoList().get(0).getAddress());
               poiInfo.setName(poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
@@ -390,8 +391,11 @@ public class SearchResultActivity extends AppCompatActivity {
                     toResultDetails.putExtra("ResultName",poiDetailSearchResult.getPoiDetailInfoList().get(0).getName());
                     toResultDetails.putExtra("ResultUid",poiDetailSearchResult.getPoiDetailInfoList().get(0).getUid());
                     toResultDetails.putExtra("ResultCity",poiDetailSearchResult.getPoiDetailInfoList().get(0).getCity());
-                    toResultDetails.putExtra("ReaultLongitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().longitude);
-                    toResultDetails.putExtra("ReaultLatitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().latitude);
+                    toResultDetails.putExtra("ResultLongitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().longitude);
+                    toResultDetails.putExtra("ResultLatitude",poiDetailSearchResult.getPoiDetailInfoList().get(0).getLocation().latitude);
+                    toResultDetails.putExtra("ResultAddress",poiDetailSearchResult.getPoiDetailInfoList().get(0).getAddress());
+                    /*Log.d("SearchResultActivity", "onItemClick: "+poiDetailSearchResult.getPoiDetailInfoList().get(0).getAddress());*/
+
                     startActivity(toResultDetails);
 
                 }
@@ -487,7 +491,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
               }
               @Override
-              public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+              public void onGetReverseGeoCodeResult(final ReverseGeoCodeResult reverseGeoCodeResult) {
                   final ReverseGeoCodeResult.AddressComponent addressDetail = reverseGeoCodeResult.getAddressDetail();
                   View view=View.inflate(getApplicationContext(),R.layout.infowindow,null);
                   TextView agentName=(TextView)view.findViewById(R.id.agent_name);
@@ -508,8 +512,9 @@ public class SearchResultActivity extends AppCompatActivity {
                           toResultDetails.putExtra("ResultName",markerResult[0]);
                           toResultDetails.putExtra("ResultUid",markerResult[1]);
                           toResultDetails.putExtra("ResultCity",addressDetail.city);
-                          toResultDetails.putExtra("ReaultLongitude",markerLaLng.longitude);
-                          toResultDetails.putExtra("ReaultLatitude",markerLaLng.latitude );
+                          toResultDetails.putExtra("ResultLongitude",markerLaLng.longitude);
+                          toResultDetails.putExtra("ResultLatitude",markerLaLng.latitude );
+                          toResultDetails.putExtra("ResultAddress",reverseGeoCodeResult.getAddress() );
                           startActivity(toResultDetails);
                       }
                   });

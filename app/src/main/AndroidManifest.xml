@@ -39,7 +39,11 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="即视">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <service
@@ -55,11 +59,7 @@
         <activity android:name=".activity.SearchResultActivity" />
         <activity android:name=".activity.ResultDetailsActivity" />
         <activity android:name=".activity.RoutePlanActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

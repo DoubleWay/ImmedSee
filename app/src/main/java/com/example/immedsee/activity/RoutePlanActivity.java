@@ -1,19 +1,27 @@
 package com.example.immedsee.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.Address;
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.model.LatLng;
@@ -59,7 +67,14 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     BaiduMap mBaidumap = null;
     // 搜索相关
     RoutePlanSearch mSearch = null;    // 搜索模块，也可去掉地图模块独立使用
-
+    public LocationClient mLocationClient; //定位模块
+    public boolean isFirstLocate=true; //判断是不是第一次定位
+    private String resultCity; //接收路线搜索的城市
+    private String resultAddress; //接收路线搜索的目标地址
+    private String resultName; //接收路线搜索的目标
+    private EditText editSt ;
+    private EditText editEn ;  //初始化起终点信息输入框
+    private String locationAddress; //保留定位留下来的地址信息
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,9 +82,13 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         setContentView(R.layout.activity_route_plan);
         CharSequence titleLable = "路线规划功能";
         setTitle(titleLable);
+
+        
         // 初始化地图
         mMapView = (MapView) findViewById(R.id.map);
         mBaidumap = mMapView.getMap();
+        mLocationClient=new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener (new MyLocationListener());
         mBtnPre = (Button) findViewById(R.id.pre);
         mBtnNext = (Button) findViewById(R.id.next);
         mBtnPre.setVisibility(View.INVISIBLE);
@@ -79,8 +98,64 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         // 初始化搜索模块，注册事件监听
         mSearch = RoutePlanSearch.newInstance();
         mSearch.setOnGetRoutePlanResultListener(this);
+        requestLocation(); //开启定位
+        Intent intent=getIntent();
+        resultCity=intent.getStringExtra("ResultCity");
+        resultAddress=intent.getStringExtra("ResultAddress");
+        resultName=intent.getStringExtra("ResultName");
+        editSt = (EditText) findViewById(R.id.start);
+        editEn = (EditText) findViewById(R.id.end);
+        editEn.setText(resultAddress);
+
     }
 
+    /**
+     * 定位初始化方法
+     */
+    private void requestLocation() {
+        initLocation();
+        mLocationClient.start();
+    }
+
+    private void initLocation() {
+        LocationClientOption option=new LocationClientOption();
+        option.setCoorType("bd09ll");
+        //option.setScanSpan(1000);
+        option.setOpenGps(true);
+        //  option.setLocationMode(LocationClientOption.LocationMode.Device_Sensors);
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
+    }
+
+    /**
+     * 地图定位监听
+     */
+    public class MyLocationListener extends BDAbstractLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            if(bdLocation.getLocType()==BDLocation.TypeNetWorkLocation||bdLocation.getLocType()==BDLocation.TypeGpsLocation){
+                navigateTo(bdLocation);
+            }
+
+
+        }
+    }
+
+    /**
+     *移动到自己的位置
+     */
+    private void navigateTo(BDLocation bdLocation) {
+        if (isFirstLocate) {
+            LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
+            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+            mBaidumap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.zoomTo(17f);
+            mBaidumap.animateMapStatus(update);
+            isFirstLocate = false;
+        }
+        locationAddress=bdLocation.getProvince()+bdLocation.getCity()+bdLocation.getDistrict()+bdLocation.getStreet();
+        editSt.setText(locationAddress);
+    }
     /**按钮的点击方法
      * 发起路线规划搜索示例
      *
@@ -93,11 +168,10 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mBtnNext.setVisibility(View.INVISIBLE);
         mBaidumap.clear(); //清除地图上画的路线
         // 处理搜索按钮响应
-        EditText editSt = (EditText) findViewById(R.id.start);
-        EditText editEn = (EditText) findViewById(R.id.end);
+
         // 设置起终点信息，对于tranist search 来说，城市名无意义
-        PlanNode stNode = PlanNode.withCityNameAndPlaceName("北京", editSt.getText().toString());//通过地名和城市名确定出行节点信息
-        PlanNode enNode = PlanNode.withCityNameAndPlaceName("北京", editEn.getText().toString());
+        PlanNode stNode = PlanNode.withCityNameAndPlaceName(resultCity, editSt.getText().toString());//通过地名和城市名确定出行节点信息
+        PlanNode enNode = PlanNode.withCityNameAndPlaceName(resultCity, editEn.getText().toString());
 
         // 实际使用中请对起点终点城市进行正确的设定
         if (v.getId() == R.id.drive) {
@@ -107,7 +181,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         } else if (v.getId() == R.id.transit) {
             //公交行驶
             mSearch.transitSearch((new TransitRoutePlanOption())
-                    .from(stNode).city("北京").to(enNode));
+                    .from(stNode).city(resultCity).to(enNode));
         } else if (v.getId() == R.id.walk) {
             //步行
             mSearch.walkingSearch((new WalkingRoutePlanOption())
@@ -237,7 +311,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             mBtnPre.setVisibility(View.VISIBLE);
             mBtnNext.setVisibility(View.VISIBLE);
             route = result.getRouteLines().get(0);
-            WalkingRouteOverlay overlay = new MyWalkingRouteOverlay(mBaidumap);
+            WalkingRouteOverlay overlay = new WalkingRouteOverlay(mBaidumap);
             mBaidumap.setOnMarkerClickListener(overlay);
             routeOverlay = overlay;
             //设置路线数据
@@ -268,7 +342,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             mBtnPre.setVisibility(View.VISIBLE);
             mBtnNext.setVisibility(View.VISIBLE);
             route = result.getRouteLines().get(0);
-            TransitRouteOverlay overlay = new MyTransitRouteOverlay(mBaidumap);
+            TransitRouteOverlay overlay = new TransitRouteOverlay(mBaidumap);
             mBaidumap.setOnMarkerClickListener(overlay);
             routeOverlay = overlay;
             //设置路线数据
@@ -303,7 +377,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             mBtnPre.setVisibility(View.VISIBLE);
             mBtnNext.setVisibility(View.VISIBLE);
             route = result.getRouteLines().get(0);
-            DrivingRouteOverlay overlay = new MyDrivingRouteOverlay(mBaidumap);
+            DrivingRouteOverlay overlay = new DrivingRouteOverlay(mBaidumap);
             routeOverlay = overlay;
             mBaidumap.setOnMarkerClickListener(overlay);
             overlay.setData(result.getRouteLines().get(0));  //设置路线数据
@@ -337,116 +411,13 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
             mBtnPre.setVisibility(View.VISIBLE);
             mBtnNext.setVisibility(View.VISIBLE);
             route = bikingRouteResult.getRouteLines().get(0);
-            BikingRouteOverlay overlay = new MyBikingRouteOverlay(mBaidumap);
+            BikingRouteOverlay overlay = new BikingRouteOverlay(mBaidumap);
             routeOverlay = overlay;
             mBaidumap.setOnMarkerClickListener(overlay);
             overlay.setData(bikingRouteResult.getRouteLines().get(0));//设置路线数据
             overlay.addToMap();//将所有overlay添加到地图中
             overlay.zoomToSpan(); //缩放地图
         }
-    }
-
-    /**
-     * 用于显示步行路线的overlay，自3.4.0版本起可实例化多个添加在地图中显示
-     */
-    private class MyWalkingRouteOverlay extends WalkingRouteOverlay {
-
-        public MyWalkingRouteOverlay(BaiduMap baiduMap) {
-            super(baiduMap);
-        }
-
-        @Override
-        public BitmapDescriptor getStartMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_st);
-            }
-            return null;
-        }
-
-        @Override
-        public BitmapDescriptor getTerminalMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_en);
-            }
-            return null;
-        }
-    }
-    /**
-     * 用于显示一条驾车路线的overlay，自3.4.0版本起可实例化多个添加在地图中显示，当数据中包含路况数据时，则默认使用路况纹理分段绘制
-     */
-    // 定制RouteOverly
-    private class MyDrivingRouteOverlay extends DrivingRouteOverlay {
-
-        public MyDrivingRouteOverlay(BaiduMap baiduMap) {
-            super(baiduMap);
-        }
-
-        @Override
-        public BitmapDescriptor getStartMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_st);
-            }
-            return null;
-        }
-
-        @Override
-        public BitmapDescriptor getTerminalMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_en);
-            }
-            return null;
-        }
-    }
-
-    /**
-     * 用于显示换乘路线的Overlay，自3.4.0版本起可实例化多个添加在地图中显示
-     */
-    private class MyTransitRouteOverlay extends TransitRouteOverlay {
-
-        public MyTransitRouteOverlay(BaiduMap baiduMap) {
-            super(baiduMap);
-        }
-
-        @Override
-        public BitmapDescriptor getStartMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_st);
-            }
-            return null;
-        }
-
-        @Override
-        public BitmapDescriptor getTerminalMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_en);
-            }
-            return null;
-        }
-    }
-    /**
-     * 用于显示骑行路线的Overlay
-     */
-    private class MyBikingRouteOverlay extends BikingRouteOverlay {
-        public  MyBikingRouteOverlay(BaiduMap baiduMap) {
-            super(baiduMap);
-        }
-
-        @Override
-        public BitmapDescriptor getStartMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_st);
-            }
-            return null;
-        }
-
-        @Override
-        public BitmapDescriptor getTerminalMarker() {
-            if (useDefaultIcon) {
-                return BitmapDescriptorFactory.fromResource(R.drawable.icon_en);
-            }
-            return null;
-        }
-
     }
 
     @Override
@@ -473,6 +444,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
 
     @Override
     protected void onDestroy() {
+        mLocationClient.stop();
         mSearch.destroy();
         mMapView.onDestroy();
         super.onDestroy();

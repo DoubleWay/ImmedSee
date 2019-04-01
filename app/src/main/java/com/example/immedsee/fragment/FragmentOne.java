@@ -439,6 +439,7 @@ public class FragmentOne extends Fragment{
                             toResultDetails.putExtra("ResultCity",addressDetail.city);
                             toResultDetails.putExtra("ReaultLongitude", markerLaLng.longitude);
                             toResultDetails.putExtra("ReaultLatitude", markerLaLng.latitude);
+                            toResultDetails.putExtra("ResultAddress",reverseGeoCodeResult.getAddress());
                             startActivity(toResultDetails);
 
                         }

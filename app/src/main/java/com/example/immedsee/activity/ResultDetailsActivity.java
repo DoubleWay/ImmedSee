@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -40,6 +41,7 @@ public class ResultDetailsActivity extends AppCompatActivity {
     private String resultName;
     private String resultCity;
     private String resultUid;
+    private String resultAddress; //保存目标地点的地址
     private double resultLongitude;
     private double resultLatitude;
     private PoiSearch mPoiSearch;
@@ -67,12 +69,13 @@ public class ResultDetailsActivity extends AppCompatActivity {
          resultName=intent.getStringExtra("ResultName");
         resultCity=intent.getStringExtra("ResultCity");
          resultUid=intent.getStringExtra("ResultUid");
-         resultLatitude=intent.getDoubleExtra("ReaultLatitude",0);
-        Log.d("ResultDetails", "resultLatitude: "+resultLatitude);
-         resultLongitude=intent.getDoubleExtra("ReaultLongitude",0);
-        Log.d("ResultDetails", "resultLongitude: "+resultLongitude);
+         resultAddress=intent.getStringExtra("ResultAddress");
+        Log.d("ResultDetails", "resultAddress: "+resultAddress);
+         resultLatitude=intent.getDoubleExtra("ResultLatitude",0);
+       // Log.d("ResultDetails", "resultLatitude: "+resultLatitude);
+         resultLongitude=intent.getDoubleExtra("ResultLongitude",0);
+       // Log.d("ResultDetails", "resultLongitude: "+resultLongitude);
         resultToSearch=(CardView)findViewById(R.id.result_toSearch);
-
         mPoiSearch= PoiSearch.newInstance();
         mPoiSearch.setOnGetPoiSearchResultListener(poiSearchResultListener);//设置POI检索监听器
         resultNameText=(TextView)findViewById(R.id.result_name_text);
@@ -90,6 +93,18 @@ public class ResultDetailsActivity extends AppCompatActivity {
         }
         collapsingToolbarLayout.setTitle(resultName);
 
+        final FloatingActionButton routeToResult =(FloatingActionButton)findViewById(R.id.route_toResult);
+        routeToResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent routeToResultIntent=new Intent(ResultDetailsActivity.this,RoutePlanActivity.class);
+                routeToResultIntent.putExtra("ResultCity",resultCity);
+                routeToResultIntent.putExtra("ResultName",resultName);
+                routeToResultIntent.putExtra("ResultAddress",resultAddress);
+
+                startActivity(routeToResultIntent);
+            }
+        });
         resultToSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

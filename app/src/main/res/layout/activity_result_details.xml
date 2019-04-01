@@ -152,6 +152,7 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/route_toResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/to_search_result"
