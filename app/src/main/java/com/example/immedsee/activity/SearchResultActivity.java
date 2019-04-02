@@ -165,6 +165,7 @@ public class SearchResultActivity extends AppCompatActivity {
 
             });
           }else {
+
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
@@ -176,9 +177,8 @@ public class SearchResultActivity extends AppCompatActivity {
             /**
              * 根据模糊搜索传来的UID进行poi详情搜索
              */
-            mPoiSearch.searchPoiDetail((new PoiDetailSearchOption())
-                    .poiUids(mLocationUid));
-              marker();
+            requestLocation();
+            marker();
           }
 
         floatSearchResult.setOnClickListener(new View.OnClickListener() {
@@ -220,10 +220,31 @@ public class SearchResultActivity extends AppCompatActivity {
     public class MyLocationListener extends BDAbstractLocationListener {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
+            /**
+             * 在定位中判断传入的是否是sug搜索的坐标
+             * 如果不是就进行poi搜索
+             * 如果是就进行定位和标注
+             * 然后判断是定位的周边搜索还是目标地点的周边搜索，然后决定坐标是否赋值
+             */
             if(bdLocation.getLocType()==BDLocation.TypeNetWorkLocation||bdLocation.getLocType()==BDLocation.TypeGpsLocation){
-                navigateTo(bdLocation);
-            }
+                if(resultLocationLatitude!=0&&resultLocationLongitude!=0){
+                    mCurrentLatitude=resultLocationLatitude;
+                    mCurrentLongitude=resultLocationLongitude;
+                }else {
+                mCurrentLatitude= bdLocation.getLatitude();
+                mCurrentLongitude= bdLocation.getLongitude();
+                }
+                if(mLatitude==0&&mLongitude==0) {
+                    navigateTo(bdLocation);
+                    mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(20)).radius(1000)
+                            .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                            .keyword(Query));
+                }else {
+                    mPoiSearch.searchPoiDetail((new PoiDetailSearchOption())
+                            .poiUids(mLocationUid));
 
+                }
+            }
         }
     }
 
@@ -247,27 +268,11 @@ public class SearchResultActivity extends AppCompatActivity {
         //  mLatLng=new LatLng(bdLocation.getLatitude(),bdLocation.getLongitude());
         mcurrentLoction=bdLocation;
         mCurrentAccracy= bdLocation.getRadius();
-        mCurrentLatitude= bdLocation.getLatitude();
-        mCurrentLongitude= bdLocation.getLongitude();
+
         baiduMap.setMyLocationData(myLocationData);
       //  Log.d("this", "navigateTo: "+mCurrentLatitude+" "+mCurrentLongitude);
-        /**
-         * 判断传入的是否是sug搜索的坐标
-         * 如果不是就进行poi搜索
-         * 如果是就进行定位和标注
-         * 然后判断是定位的周边搜索还是目标地点的周边搜索，然后决定坐标是否赋值
-         */
 
-    if(resultLocationLatitude!=0&&resultLocationLongitude!=0){
-        mCurrentLatitude=resultLocationLatitude;
-        mCurrentLongitude=resultLocationLongitude;
-    }
 
-        if(mLatitude==0&&mLongitude==0) {
-            mPoiSearch.searchNearby((new PoiNearbySearchOption().pageCapacity(20)).radius(1000)
-                    .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
-                    .keyword(Query));
-        }
 
     }
 
@@ -359,6 +364,8 @@ public class SearchResultActivity extends AppCompatActivity {
                 }
 
 
+            }else {
+                Toast.makeText(SearchResultActivity.this,"对不起，周边没有您搜索的场所",Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -505,6 +512,7 @@ public class SearchResultActivity extends AppCompatActivity {
                   //显示信息窗口
                   baiduMap.showInfoWindow(infoWindow);
                   TextView detailsText=(TextView) view.findViewById(R.id.details);
+                  TextView navigationText=(TextView)view.findViewById(R.id.navigation);
                   detailsText.setOnClickListener(new View.OnClickListener() {
                       @Override
                       public void onClick(View view) {
@@ -516,6 +524,18 @@ public class SearchResultActivity extends AppCompatActivity {
                           toResultDetails.putExtra("ResultLatitude",markerLaLng.latitude );
                           toResultDetails.putExtra("ResultAddress",reverseGeoCodeResult.getAddress() );
                           startActivity(toResultDetails);
+                      }
+                  });
+                  navigationText.setOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View view) {
+                          Intent toRoutePlanIntent=new Intent(getApplicationContext(), RoutePlanActivity.class);
+                          toRoutePlanIntent.putExtra("ResultName", marker.getTitle());
+                          toRoutePlanIntent.putExtra("ResultCity",addressDetail.city);
+                          toRoutePlanIntent.putExtra("ResultLongitude", markerLaLng.longitude);
+                          toRoutePlanIntent.putExtra("ResultLatitude", markerLaLng.latitude);
+                          toRoutePlanIntent.putExtra("ResultAddress",reverseGeoCodeResult.getAddress());
+                          startActivity(toRoutePlanIntent);
                       }
                   });
                   Log.d("that", "反地理编码信息 "+reverseGeoCodeResult.getAddress());

@@ -26,14 +26,23 @@
             android:orientation="vertical" >
 
             <Button
-                android:id="@+id/customicon"
+                android:id="@+id/walk_guide"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:layout_weight="1.0"
                 android:background="@drawable/button_style"
                 android:onClick="changeRouteIcon"
-                android:text="自定义起终点图标" />
+                android:text="步行导航" />
+            <Button
+                android:id="@+id/bike_guide"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1.0"
+                android:background="@drawable/button_style"
+                android:onClick="changeRouteIcon"
+                android:text="骑行导航" />
         </LinearLayout>
 
         <LinearLayout

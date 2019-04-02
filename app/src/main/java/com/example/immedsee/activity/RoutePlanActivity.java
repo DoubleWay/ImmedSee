@@ -1,6 +1,9 @@
 package com.example.immedsee.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +19,11 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.bikenavi.BikeNavigateHelper;
+import com.baidu.mapapi.bikenavi.adapter.IBEngineInitListener;
+import com.baidu.mapapi.bikenavi.adapter.IBRoutePlanListener;
+import com.baidu.mapapi.bikenavi.model.BikeRoutePlanError;
+import com.baidu.mapapi.bikenavi.params.BikeNaviLaunchParam;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -24,6 +32,9 @@ import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
@@ -44,12 +55,19 @@ import com.baidu.mapapi.search.route.TransitRouteResult;
 import com.baidu.mapapi.search.route.WalkingRouteLine;
 import com.baidu.mapapi.search.route.WalkingRoutePlanOption;
 import com.baidu.mapapi.search.route.WalkingRouteResult;
+import com.baidu.mapapi.walknavi.WalkNavigateHelper;
+import com.baidu.mapapi.walknavi.adapter.IWEngineInitListener;
+import com.baidu.mapapi.walknavi.adapter.IWRoutePlanListener;
+import com.baidu.mapapi.walknavi.model.WalkRoutePlanError;
+import com.baidu.mapapi.walknavi.params.WalkNaviLaunchParam;
 import com.example.immedsee.R;
 import com.example.immedsee.overly.BikingRouteOverlay;
 import com.example.immedsee.overly.DrivingRouteOverlay;
 import com.example.immedsee.overly.OverlayManager;
 import com.example.immedsee.overly.TransitRouteOverlay;
 import com.example.immedsee.overly.WalkingRouteOverlay;
+
+import java.util.ArrayList;
 
 public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnMapClickListener,
         OnGetRoutePlanResultListener {
@@ -58,7 +76,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     int nodeIndex = -1; // 节点索引,供浏览节点时使用
     RouteLine route = null;  //路线
     OverlayManager routeOverlay = null;  //该类提供一个能够显示和管理多个Overlay的基类
-    boolean useDefaultIcon = false;  //
     private TextView popupText = null; // 泡泡view
 
     // 地图相关，使用继承MapView的MyRouteMapView目的是重写touch事件实现泡泡处理
@@ -74,7 +91,23 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private String resultName; //接收路线搜索的目标
     private EditText editSt ;
     private EditText editEn ;  //初始化起终点信息输入框
-    private String locationAddress; //保留定位留下来的地址信息
+    private static String locationAddress; //保留定位留下来的地址信息
+    private double resultLatitude; //接收目标地址的经纬度
+    private double resultLongitude;
+
+    private double mLatitude;//保存初次定位后的位置信息
+   private double mLongitude;
+   private BDLocation mBDLocation;
+
+    /*导航起终点Marker，可拖动改变起终点的坐标*/
+    private LatLng startPt,endPt;
+
+    BikeNaviLaunchParam bikeParam;
+    WalkNaviLaunchParam walkParam;
+
+    private static boolean isPermissionRequested = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,10 +116,10 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         CharSequence titleLable = "路线规划功能";
         setTitle(titleLable);
 
-        
         // 初始化地图
         mMapView = (MapView) findViewById(R.id.map);
         mBaidumap = mMapView.getMap();
+        requestPermission();//权限申请
         mLocationClient=new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener (new MyLocationListener());
         mBtnPre = (Button) findViewById(R.id.pre);
@@ -103,9 +136,17 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         resultCity=intent.getStringExtra("ResultCity");
         resultAddress=intent.getStringExtra("ResultAddress");
         resultName=intent.getStringExtra("ResultName");
+        resultLatitude=intent.getDoubleExtra("ResultLatitude",0);
+        resultLongitude=intent.getDoubleExtra("ResultLongitude",0);
         editSt = (EditText) findViewById(R.id.start);
         editEn = (EditText) findViewById(R.id.end);
         editEn.setText(resultAddress);
+
+        Log.d("RoutePlan", "resultLatitude: "+resultLatitude);
+        Log.d("RoutePlan", "resultLongitude: "+resultLongitude);
+        Log.d("RoutePlan", "mLatitude: "+mLatitude);
+        Log.d("RoutePlan", "mLongitude: "+mLongitude);
+
 
     }
 
@@ -134,9 +175,21 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if(bdLocation.getLocType()==BDLocation.TypeNetWorkLocation||bdLocation.getLocType()==BDLocation.TypeGpsLocation){
+                mBDLocation=bdLocation;
+                mLatitude=bdLocation.getLatitude();
+                mLongitude=bdLocation.getLongitude();
+                locationAddress=bdLocation.getProvince()+bdLocation.getCity()+bdLocation.getDistrict()+bdLocation.getStreet();
+                Log.d("RoutePlan", "onReceiveLocation: "+locationAddress);
+                if(locationAddress!=null){
+                    editSt.setText(locationAddress);
+                }
+                startPt = new LatLng(mLatitude,mLongitude);//初始步行导航起终点
+                endPt = new LatLng(resultLatitude, resultLongitude);
+//构造Bike,WalkNaviLaunchParam
+                walkParam = new WalkNaviLaunchParam().stPt(startPt).endPt(endPt);
+                bikeParam = new BikeNaviLaunchParam().stPt(startPt).endPt(endPt);
                 navigateTo(bdLocation);
             }
-
 
         }
     }
@@ -145,16 +198,16 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
      *移动到自己的位置
      */
     private void navigateTo(BDLocation bdLocation) {
-        if (isFirstLocate) {
+
             LatLng ll = new LatLng(bdLocation.getLatitude(), bdLocation.getLongitude());
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
             mBaidumap.animateMapStatus(update);
             update = MapStatusUpdateFactory.zoomTo(17f);
             mBaidumap.animateMapStatus(update);
-            isFirstLocate = false;
-        }
-        locationAddress=bdLocation.getProvince()+bdLocation.getCity()+bdLocation.getDistrict()+bdLocation.getStreet();
-        editSt.setText(locationAddress);
+
+
+//保存定位的信息
+
     }
     /**按钮的点击方法
      * 发起路线规划搜索示例
@@ -170,8 +223,10 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         // 处理搜索按钮响应
 
         // 设置起终点信息，对于tranist search 来说，城市名无意义
-        PlanNode stNode = PlanNode.withCityNameAndPlaceName(resultCity, editSt.getText().toString());//通过地名和城市名确定出行节点信息
-        PlanNode enNode = PlanNode.withCityNameAndPlaceName(resultCity, editEn.getText().toString());
+       /* PlanNode stNode = PlanNode.withCityNameAndPlaceName(resultCity, editSt.getText().toString());//通过地名和城市名确定出行节点信息
+        PlanNode enNode = PlanNode.withCityNameAndPlaceName(resultCity, editEn.getText().toString());*/
+        PlanNode stNode = PlanNode.withLocation(new LatLng(mLatitude,mLongitude));//通过经纬度确定出行节点信息
+        PlanNode enNode = PlanNode.withLocation(new LatLng(resultLatitude,resultLongitude));
 
         // 实际使用中请对起点终点城市进行正确的设定
         if (v.getId() == R.id.drive) {
@@ -264,7 +319,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
      * 注意： 起终点图标使用中心对齐.
      */
     public void changeRouteIcon(View v) {
-        if (routeOverlay == null) {
+ /*       if (routeOverlay == null) {
             return;
         }
         if (useDefaultIcon) {
@@ -282,7 +337,14 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         }
         useDefaultIcon = !useDefaultIcon;
         routeOverlay.removeFromMap();  //将所有overlay从地图中移出
-        routeOverlay.addToMap();  //添加
+        routeOverlay.addToMap();  //添加*/
+  if(v.getId()==R.id.walk_guide){
+        walkParam.extraNaviMode(0);
+        startWalkNavi();
+  } else if(v.getId()==R.id.bike_guide){
+         startBikeNavi();
+        }
+
     }
 
     @Override
@@ -429,6 +491,134 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     public boolean onMapPoiClick(MapPoi poi) {
         return false;
     }
+    /**
+     * 开始骑行导航
+     */
+    private void startBikeNavi() {
+        Log.d("guide", "startBikeNavi");
+        try {
+            BikeNavigateHelper.getInstance().initNaviEngine(this, new IBEngineInitListener() {
+                @Override
+                public void engineInitSuccess() {
+                    Log.d("guide", "BikeNavi engineInitSuccess");
+                    routePlanWithBikeParam();
+                }
+
+                @Override
+                public void engineInitFail() {
+                    Log.d("guide", "BikeNavi engineInitFail");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("guide", "startBikeNavi Exception");
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 发起骑行导航算路
+     */
+    private void routePlanWithBikeParam() {
+        BikeNavigateHelper.getInstance().routePlanWithParams(bikeParam, new IBRoutePlanListener() {
+            @Override
+            public void onRoutePlanStart() {
+                Log.d("guide", "BikeNavi onRoutePlanStart");
+            }
+
+            @Override
+            public void onRoutePlanSuccess() {
+                Log.d("guide", "BikeNavi onRoutePlanSuccess");
+                Intent intent = new Intent();
+                intent.setClass(RoutePlanActivity.this, BNaviGuideActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onRoutePlanFail(BikeRoutePlanError error) {
+                Toast.makeText(RoutePlanActivity.this,"对不起，没有推荐路线",Toast.LENGTH_SHORT).show();
+                Log.d("guide", "BikeNavi onRoutePlanFail");
+                Log.d("guide", error.toString());
+            }
+
+        });
+    }
+
+    /**
+     * 开始步行导航
+     */
+    private void startWalkNavi() {
+        Log.d("guide", "startBikeNavi");
+        try {
+            WalkNavigateHelper.getInstance().initNaviEngine(this, new IWEngineInitListener() {
+                @Override
+                public void engineInitSuccess() {
+                    Log.d("guide", "WalkNavi engineInitSuccess");
+                    routePlanWithWalkParam();
+                }
+
+                @Override
+                public void engineInitFail() {
+                    Log.d("guide", "WalkNavi engineInitFail");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("guide", "startBikeNavi Exception");
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 发起步行导航算路
+     */
+    private void routePlanWithWalkParam() {
+        WalkNavigateHelper.getInstance().routePlanWithParams(walkParam, new IWRoutePlanListener() {
+            @Override
+            public void onRoutePlanStart() {
+                Log.d("guide", "WalkNavi onRoutePlanStart");
+            }
+
+            @Override
+            public void onRoutePlanSuccess() {
+                Log.d("View", "onRoutePlanSuccess");
+                Intent intent = new Intent();
+                intent.setClass(RoutePlanActivity.this, WNaviGuideActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onRoutePlanFail(WalkRoutePlanError error) {
+                Log.d("guide", error.toString());
+                Toast.makeText(RoutePlanActivity.this,"对不起，没有推荐路线",Toast.LENGTH_SHORT).show();
+                Log.d("guide", "WalkNavi onRoutePlanFail");
+            }
+
+        });
+    }
+
+    /**
+     * Android6.0之后需要动态申请权限
+     */
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= 23 && !isPermissionRequested) {
+
+            isPermissionRequested = true;
+
+            ArrayList<String> permissions = new ArrayList<>();
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+
+            if (permissions.size() == 0) {
+                return;
+            } else {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), 0);
+            }
+        }
+    }
+/*
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mLocationClient.start();
+    }*/
 
     @Override
     protected void onPause() {

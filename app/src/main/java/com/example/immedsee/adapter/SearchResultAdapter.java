@@ -69,7 +69,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         /**
          * 计算到目标地点的距离，并省略一位小数转化为String
          */
-        double distance = (DistanceUtil.getDistance(mLocationLatlng,info.getLocation()))/10000;
+        double distance = (DistanceUtil.getDistance(mLocationLatlng,info.getLocation()))/1000;
         String s=String.format("%.2f",distance);
         holder.resultDistance.setText(s+"公里");
         if(mOnItemClickListener!=null){

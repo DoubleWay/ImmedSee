@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,7 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.example.immedsee.R;
 import com.example.immedsee.activity.ResultDetailsActivity;
+import com.example.immedsee.activity.RoutePlanActivity;
 import com.example.immedsee.activity.SearchActivity;
 
 import java.util.ArrayList;
@@ -77,7 +79,9 @@ public class FragmentOne extends Fragment{
     private Marker marker;
     private BitmapDescriptor bd; //加载标注物的图片
     private String []markerResult=null; //装拆分后的marker的poi的name和uid
-
+    Boolean isSetTrafficCard=false;//判断地图是否开启路况
+    Boolean isMapChange=false;//判断地图类型是否切换
+    int locaType=0; //用来更改地图的定位模式
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -151,6 +155,7 @@ public class FragmentOne extends Fragment{
         baiduMap=mapView.getMap();
        // baiduMap.setTrafficEnabled(true);
         baiduMap.setMyLocationEnabled(true);
+
         baiduMap.setOnMapLongClickListener(mapLongClickListener);//设置长按地图事件监听
         baiduMap.setOnMarkerClickListener(markerClickListener);//设置marker点击事件监听
         baiduMap.setOnMapClickListener(mapClickListener);//设置地图点击事件监听
@@ -159,6 +164,81 @@ public class FragmentOne extends Fragment{
          */
         myOrientationListener.start();
         super.onStart();
+        /**
+         * 地图路况开启判断
+         */
+        CardView setTrafficCard=getView().findViewById(R.id.setTraffic);
+        setTrafficCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isSetTrafficCard) {
+                    baiduMap.setTrafficEnabled(true);
+                    ImageView trafficImage = (ImageView) view.findViewById(R.id.traffic_image);
+                    trafficImage.setImageResource(R.drawable.traffic_up);
+                    isSetTrafficCard=true;
+                }else{
+                    baiduMap.setTrafficEnabled(false);
+                    ImageView trafficImage = (ImageView) view.findViewById(R.id.traffic_image);
+                    trafficImage.setImageResource(R.drawable.traffic_down);
+                    isSetTrafficCard=false;
+                }
+            }
+        });
+        CardView mapChangeCard=getView().findViewById(R.id.mapChange);
+        mapChangeCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                 if(!isMapChange){
+                     baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+                     ImageView mapImage = (ImageView) view.findViewById(R.id.map_image);
+                     mapImage.setImageResource(R.drawable.map_change_map_type_satelllte);
+                     isMapChange=true;
+                 }else {
+                     baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+                     ImageView mapImage = (ImageView) view.findViewById(R.id.map_image);
+                     mapImage.setImageResource(R.drawable.map_change_map_type_normal);
+                     isMapChange=false;
+                 }
+            }
+        });
+        CardView locaTypeCard=(CardView)getView().findViewById(R.id.loca_type);
+        locaTypeCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(locaType==0){
+                mCurrentMode= MyLocationConfiguration.LocationMode.COMPASS;
+                    BitmapDescriptor mCurrentMarker = BitmapDescriptorFactory
+                            .fromResource(R.drawable.arrow);
+                    MyLocationConfiguration configuration=new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker);
+                    baiduMap.setMyLocationConfiguration(configuration);
+                    ImageView locaImage = (ImageView) view.findViewById(R.id.loca_image);
+                    locaImage.setImageResource(R.drawable.loca_comepass);
+                    Toast.makeText(getActivity().getApplicationContext(),"罗盘模式",Toast.LENGTH_SHORT).show();
+                    locaType=1;
+                }else  if(locaType==1){
+                    mCurrentMode=MyLocationConfiguration.LocationMode.FOLLOWING;
+                    BitmapDescriptor mCurrentMarker = BitmapDescriptorFactory
+                            .fromResource(R.drawable.arrow);
+                    MyLocationConfiguration configuration=new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker);
+                    baiduMap.setMyLocationConfiguration(configuration);
+                    ImageView locaImage = (ImageView) view.findViewById(R.id.loca_image);
+                    locaImage.setImageResource(R.drawable.loca_follow);
+                    Toast.makeText(getActivity().getApplicationContext(),"跟随模式",Toast.LENGTH_SHORT).show();
+                    locaType=2;
+                }else if(locaType==2){
+                    mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
+                    BitmapDescriptor mCurrentMarker = BitmapDescriptorFactory
+                            .fromResource(R.drawable.arrow);
+                    MyLocationConfiguration configuration=new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker);
+                    baiduMap.setMyLocationConfiguration(configuration);
+                    ImageView locaImage = (ImageView) view.findViewById(R.id.loca_image);
+                    locaImage.setImageResource(R.drawable.loca_normal);
+                    Toast.makeText(getActivity().getApplicationContext(),"普通模式",Toast.LENGTH_SHORT).show();
+                    locaType=0;
+                }
+
+            }
+        });
     }
     private void requestLocation() {
         initLocation();
@@ -405,6 +485,7 @@ public class FragmentOne extends Fragment{
         @Override
         public boolean onMarkerClick(final Marker marker) {
              final LatLng markerLaLng=marker.getPosition();
+            Log.d("ResultDetails", "onMarkerClick: "+markerLaLng.toString());
             GeoCoder geoCoder = GeoCoder.newInstance();
             //设置反地理编码位置坐标
             ReverseGeoCodeOption option = new ReverseGeoCodeOption();
@@ -421,6 +502,7 @@ public class FragmentOne extends Fragment{
                     TextView agentName=(TextView)view.findViewById(R.id.agent_name);
                     TextView agentAaddr=(TextView)view.findViewById(R.id.agent_addr);
                     TextView detailsText=(TextView) view.findViewById(R.id.details);
+                    TextView navigationText=(TextView)view.findViewById(R.id.navigation);
                     /**
                      * 判断传过来的marker是长按地图产生的还是点击poi产生的，如果是前者就直接赋值，
                      * 如果是后者就拆分name和uid
@@ -437,48 +519,25 @@ public class FragmentOne extends Fragment{
                             Intent toResultDetails = new Intent(getActivity().getApplicationContext(), ResultDetailsActivity.class);
                             toResultDetails.putExtra("ResultName", marker.getTitle());
                             toResultDetails.putExtra("ResultCity",addressDetail.city);
-                            toResultDetails.putExtra("ReaultLongitude", markerLaLng.longitude);
-                            toResultDetails.putExtra("ReaultLatitude", markerLaLng.latitude);
+                            toResultDetails.putExtra("ResultLongitude", markerLaLng.longitude);
+                            toResultDetails.putExtra("ResultLatitude", markerLaLng.latitude);
                             toResultDetails.putExtra("ResultAddress",reverseGeoCodeResult.getAddress());
                             startActivity(toResultDetails);
 
                         }
                     });
-                  /* if(marker.getTitle() == null) {
-                       agentName.setText(addressDetail.city);
-                       agentAaddr.setText(reverseGeoCodeResult.getAddress());
-                       detailsText.setOnClickListener(new View.OnClickListener() {
-                           @Override
-                           public void onClick(View view) {
-                                   *//**
-                                    * 这里传入marker标注物的地址和坐标
-                                    *//*
-                                   Intent toResultDetails = new Intent(getActivity().getApplicationContext(), ResultDetailsActivity.class);
-                                   toResultDetails.putExtra("ResultName", reverseGeoCodeResult.getAddress());
-                                   toResultDetails.putExtra("ReaultLongitude", markerLaLng.longitude);
-                                   toResultDetails.putExtra("ReaultLatitude", markerLaLng.latitude);
-                                   startActivity(toResultDetails);
-
-                           }
-                       });
-                   }else {
-                       markerResult = marker.getTitle().split(" ");
-                       agentName.setText(markerResult[0]);
-                       agentAaddr.setText(reverseGeoCodeResult.getAddress());
-                       detailsText.setOnClickListener(new View.OnClickListener() {
-                           @Override
-                           public void onClick(View view) {
-                                   Intent toResultDetails = new Intent(getActivity().getApplicationContext(), ResultDetailsActivity.class);
-                                   toResultDetails.putExtra("ResultName", markerResult[0]);
-                                   toResultDetails.putExtra("ResultUid", markerResult[1]);
-                                   toResultDetails.putExtra("ReaultLongitude", markerLaLng.longitude);
-                                   toResultDetails.putExtra("ReaultLatitude", markerLaLng.latitude);
-                                   startActivity(toResultDetails);
-
-                           }
-                       });
-                   }*/
-
+                    navigationText.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent toRoutePlanIntent=new Intent(getActivity().getApplicationContext(), RoutePlanActivity.class);
+                            toRoutePlanIntent.putExtra("ResultName", marker.getTitle());
+                            toRoutePlanIntent.putExtra("ResultCity",addressDetail.city);
+                            toRoutePlanIntent.putExtra("ResultLongitude", markerLaLng.longitude);
+                            toRoutePlanIntent.putExtra("ResultLatitude", markerLaLng.latitude);
+                            toRoutePlanIntent.putExtra("ResultAddress",reverseGeoCodeResult.getAddress());
+                            startActivity(toRoutePlanIntent);
+                        }
+                    });
                     InfoWindow infoWindow=new InfoWindow(view,markerLaLng,-60);
                     //显示信息窗口
                     baiduMap.showInfoWindow(infoWindow);
@@ -490,7 +549,6 @@ public class FragmentOne extends Fragment{
             return false;
         }
     };
-
 
 
     @Override

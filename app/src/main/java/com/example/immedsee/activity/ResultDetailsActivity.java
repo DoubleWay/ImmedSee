@@ -72,9 +72,9 @@ public class ResultDetailsActivity extends AppCompatActivity {
          resultAddress=intent.getStringExtra("ResultAddress");
         Log.d("ResultDetails", "resultAddress: "+resultAddress);
          resultLatitude=intent.getDoubleExtra("ResultLatitude",0);
-       // Log.d("ResultDetails", "resultLatitude: "+resultLatitude);
+        Log.d("ResultDetails", "resultLatitude: "+resultLatitude);
          resultLongitude=intent.getDoubleExtra("ResultLongitude",0);
-       // Log.d("ResultDetails", "resultLongitude: "+resultLongitude);
+        Log.d("ResultDetails", "resultLongitude: "+resultLongitude);
         resultToSearch=(CardView)findViewById(R.id.result_toSearch);
         mPoiSearch= PoiSearch.newInstance();
         mPoiSearch.setOnGetPoiSearchResultListener(poiSearchResultListener);//设置POI检索监听器
@@ -101,7 +101,8 @@ public class ResultDetailsActivity extends AppCompatActivity {
                 routeToResultIntent.putExtra("ResultCity",resultCity);
                 routeToResultIntent.putExtra("ResultName",resultName);
                 routeToResultIntent.putExtra("ResultAddress",resultAddress);
-
+                routeToResultIntent.putExtra("ResultLatitude",resultLatitude);
+                routeToResultIntent.putExtra("ResultLongitude",resultLongitude);
                 startActivity(routeToResultIntent);
             }
         });
