@@ -151,7 +151,7 @@ public class FragmentOne extends Fragment{
 
         mapView=getView().findViewById(R.id.bmapview);
         //移除百度地图LOGO
-        mapView.removeViewAt(1);
+//        mapView.removeViewAt(1);
         baiduMap=mapView.getMap();
        // baiduMap.setTrafficEnabled(true);
         baiduMap.setMyLocationEnabled(true);
@@ -239,6 +239,15 @@ public class FragmentOne extends Fragment{
 
             }
         });
+        CardView toRouteCard=(CardView)getView().findViewById(R.id.to_route);
+        toRouteCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toRouteIntent=new Intent(getActivity().getApplicationContext(),RoutePlanActivity.class);
+                startActivity(toRouteIntent);
+
+            }
+        });
     }
     private void requestLocation() {
         initLocation();
@@ -250,6 +259,7 @@ public class FragmentOne extends Fragment{
         option.setScanSpan(1000);
         option.setOpenGps(true);
         option.setIsNeedAddress(true);
+        option.setAddrType("all");
         mLocationClient.setLocOption(option);
     }
 
@@ -418,7 +428,6 @@ public class FragmentOne extends Fragment{
         mCurrentAccracy= bdLocation.getRadius();
         mCurrentLatitude= bdLocation.getLatitude();
         mCurrentLongitude= bdLocation.getLongitude();
-
         /*BitmapDescriptor mCurrentMarker = BitmapDescriptorFactory
                 .fromResource(R.drawable.map_icon);
         MyLocationConfiguration configuration=new MyLocationConfiguration(mCurrentMode, true, mCurrentMarker);*/

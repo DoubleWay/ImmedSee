@@ -38,6 +38,12 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeOption;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.search.route.BikingRouteLine;
 import com.baidu.mapapi.search.route.BikingRoutePlanOption;
 import com.baidu.mapapi.search.route.BikingRouteResult;
@@ -91,7 +97,8 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private String resultName; //接收路线搜索的目标
     private EditText editSt ;
     private EditText editEn ;  //初始化起终点信息输入框
-    private static String locationAddress; //保留定位留下来的地址信息
+    private  String locationAddress;//保留定位留下来的地址信息
+    private String locationCity;
     private double resultLatitude; //接收目标地址的经纬度
     private double resultLongitude;
 
@@ -141,7 +148,10 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         editSt = (EditText) findViewById(R.id.start);
         editEn = (EditText) findViewById(R.id.end);
         editEn.setText(resultAddress);
+        if(resultAddress!=null) {
+            editEn.setSelection(resultAddress.length());//将光标移到最后
 
+        }
         Log.d("RoutePlan", "resultLatitude: "+resultLatitude);
         Log.d("RoutePlan", "resultLongitude: "+resultLongitude);
         Log.d("RoutePlan", "mLatitude: "+mLatitude);
@@ -150,6 +160,32 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
 
     }
 
+    public void  Geo(){
+         String []addressEn=null;
+        GeoCoder geoCoder = GeoCoder.newInstance();
+        //设置反地理编码位置坐标
+        String address=editEn.getText().toString();
+        addressEn=address.split("市");
+        geoCoder.geocode(new GeoCodeOption()
+                .city(addressEn[0])
+                .address(addressEn[1]));
+        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+                  resultLatitude=geoCodeResult.getLocation().latitude;
+                  resultLongitude=geoCodeResult.getLocation().longitude;
+                Log.d("RoutePlan", "resultLatitude: "+resultLatitude);
+                Log.d("RoutePlan", "resultLongitude: "+resultLongitude);
+
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+
+            }
+        });
+
+    }
     /**
      * 定位初始化方法
      */
@@ -161,10 +197,12 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private void initLocation() {
         LocationClientOption option=new LocationClientOption();
         option.setCoorType("bd09ll");
-        //option.setScanSpan(1000);
+        // option.setScanSpan(5000);
         option.setOpenGps(true);
         //  option.setLocationMode(LocationClientOption.LocationMode.Device_Sensors);
         option.setIsNeedAddress(true);
+
+        option.setAddrType("all");
         mLocationClient.setLocOption(option);
     }
 
@@ -178,11 +216,18 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
                 mBDLocation=bdLocation;
                 mLatitude=bdLocation.getLatitude();
                 mLongitude=bdLocation.getLongitude();
-                locationAddress=bdLocation.getProvince()+bdLocation.getCity()+bdLocation.getDistrict()+bdLocation.getStreet();
-                Log.d("RoutePlan", "onReceiveLocation: "+locationAddress);
-                if(locationAddress!=null){
-                    editSt.setText(locationAddress);
+                //解决bdLocation.getAddrStr()过段时间值变为null的问题
+                if(isFirstLocate){
+                locationAddress=bdLocation.getAddrStr();
+                locationCity=bdLocation.getCity();
+                isFirstLocate=false;
                 }
+                Log.d("RoutePlan", "onReceiveLocation: "+locationAddress);
+                Log.d("RoutePlan", "onReceiveLocation: "+bdLocation.getAddrStr());
+                Log.d("RoutePlan", "mLatitude: "+mLatitude);
+                Log.d("RoutePlan", "mLongitude: "+mLongitude);
+                editSt.setText(locationAddress);
+                editSt.setSelection(locationAddress.length());//将光标移到最后
                 startPt = new LatLng(mLatitude,mLongitude);//初始步行导航起终点
                 endPt = new LatLng(resultLatitude, resultLongitude);
 //构造Bike,WalkNaviLaunchParam
@@ -215,6 +260,8 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
      * @param v
      */
     public void searchButtonProcess(View v) {
+        PlanNode stNode;
+        PlanNode enNode;
         // 重置浏览节点的路线数据
         route = null;
         mBtnPre.setVisibility(View.INVISIBLE);
@@ -222,11 +269,16 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mBaidumap.clear(); //清除地图上画的路线
         // 处理搜索按钮响应
 
+
         // 设置起终点信息，对于tranist search 来说，城市名无意义
-       /* PlanNode stNode = PlanNode.withCityNameAndPlaceName(resultCity, editSt.getText().toString());//通过地名和城市名确定出行节点信息
-        PlanNode enNode = PlanNode.withCityNameAndPlaceName(resultCity, editEn.getText().toString());*/
-        PlanNode stNode = PlanNode.withLocation(new LatLng(mLatitude,mLongitude));//通过经纬度确定出行节点信息
-        PlanNode enNode = PlanNode.withLocation(new LatLng(resultLatitude,resultLongitude));
+        if(resultLatitude==0&&resultLongitude==0) {
+            resultCity=locationCity;
+             stNode = PlanNode.withCityNameAndPlaceName(resultCity, editSt.getText().toString());//通过地名和城市名确定出行节点信息
+             enNode = PlanNode.withCityNameAndPlaceName(resultCity, editEn.getText().toString());
+        }else {
+         stNode = PlanNode.withLocation(new LatLng(mLatitude,mLongitude));//通过经纬度确定出行节点信息
+         enNode = PlanNode.withLocation(new LatLng(resultLatitude,resultLongitude));
+        }
 
         // 实际使用中请对起点终点城市进行正确的设定
         if (v.getId() == R.id.drive) {

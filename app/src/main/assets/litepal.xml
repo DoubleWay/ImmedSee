@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+
+    <dbname value="ImmedSee" />
+
+    <version value="3" />
+
+    <list>
+        <mapping class="com.example.immedsee.dao.SearchHistory"/>
+    </list>
+
+</litepal>

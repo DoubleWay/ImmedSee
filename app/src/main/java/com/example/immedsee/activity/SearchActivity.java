@@ -1,9 +1,13 @@
 package com.example.immedsee.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,20 +15,32 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.sug.OnGetSuggestionResultListener;
 import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import com.example.immedsee.R;
 import com.example.immedsee.adapter.SugAdapter;
+import com.example.immedsee.dao.SearchHistory;
 
+import org.litepal.LitePal;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity  implements View.OnClickListener{
@@ -35,6 +51,8 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
     private SuggestionSearch mSuggestionSearch;
     private SugAdapter sugAdapter;
     private RecyclerView recyclerView;
+    private RecyclerView searchHistoryRecycler;
+
     private List<SuggestionResult.SuggestionInfo> SuggestionInfoList;
     private ImageView imageViewFood;
     private ImageView imageViewHotel;
@@ -44,16 +62,25 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
     private ImageView imageViewView;
     private ImageView imageViewKTV;
     private ImageView imageViewSupermaket;
+    private TextView historyText;
+    private TextView removeHistoryText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_search);
+
        //创建显示模糊搜索结果的列表
         recyclerView=(RecyclerView)findViewById(R.id.suggest_search_list);
+        searchHistoryRecycler=(RecyclerView)findViewById(R.id.search_history);
         GridLayoutManager layoutManager=new GridLayoutManager(getApplicationContext(),1);
+        GridLayoutManager layoutManagerhis=new GridLayoutManager(getApplicationContext(),1);
         recyclerView.setLayoutManager(layoutManager);
+        searchHistoryRecycler.setLayoutManager(layoutManagerhis);
+
+
 
         mSuggestionSearch = SuggestionSearch.newInstance();
         mSuggestionSearch.setOnGetSuggestionResultListener(suggestionResultListener);//创建Sug搜索监听器
@@ -75,6 +102,8 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
         Log.d("this", "SearchactivityLatitude: "+resultLocationLatitude);*/
 
         Log.d("this", "onCreate: "+locationCity);
+        historyText=(TextView)findViewById(R.id.history_text);
+        removeHistoryText=(TextView)findViewById(R.id.remove_history_text);
         imageViewFood=(ImageView)findViewById(R.id.search_food);
         imageViewHotel=(ImageView)findViewById(R.id.search_hotel);
         imageViewBus=(ImageView)findViewById(R.id.search_bus);
@@ -92,7 +121,51 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
         imageViewView.setOnClickListener(this);
         imageViewKTV.setOnClickListener(this);
         imageViewSupermaket.setOnClickListener(this);
+        removeHistoryText.setOnClickListener(this);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //从数据库进行遍历，将历史纪录打印出来
+        List<SearchHistory> historyList= LitePal.findAll(SearchHistory.class);
+        if(historyList.size()>0){
+            historyText.setVisibility(View.VISIBLE);
+            removeHistoryText.setVisibility(View.VISIBLE);
+        }
+        final List<SuggestionResult.SuggestionInfo> historySuggest=new ArrayList<>();
+        for(SearchHistory history:historyList){
+            SuggestionResult.SuggestionInfo mySuggestionInfo=new SuggestionResult.SuggestionInfo();
+            mySuggestionInfo.setKey(history.getName());
+            mySuggestionInfo.setPt(new LatLng(history.getLatitude(),history.getLongitude()));
+            mySuggestionInfo.setUid(history.getUid());
+            mySuggestionInfo.setCity(history.getCity());
+            mySuggestionInfo.setDistrict(history.getDistrict());
+            historySuggest.add(mySuggestionInfo);
+        }
+        sugAdapter=new SugAdapter(historySuggest);
+        searchHistoryRecycler.setAdapter(sugAdapter);
+        sugAdapter.notifyDataSetChanged();
+        sugAdapter.setOnItemClickListener(new SugAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                SuggestionResult.SuggestionInfo suggestionInfo=historySuggest.get(position);
+
+                if(suggestionInfo.getPt()!=null) {
+                    //对数据库进行操作，将推荐搜索点击历史存入数据库
+                    Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
+                    intent.putExtra("Latitude",suggestionInfo.getPt().latitude);
+                    intent.putExtra("Longitude",suggestionInfo.getPt().longitude);
+                    intent.putExtra("locationUid",suggestionInfo.getUid());
+                    intent.putExtra("SuggestKey",suggestionInfo.key);
+                    Log.d("search", "onItemClick: "+suggestionInfo.key);
+                    startActivity(intent);
+                    recyclerView.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_view, menu);
@@ -108,15 +181,48 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
 
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public boolean onQueryTextSubmit(final String query) {
                Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
                 /**
                  * 将要进行周边搜索的目标地点坐标传给搜索页面
                  */
-              intent.putExtra("ResultLocationLongitude",resultLocationLongitude);
-              intent.putExtra("ResultLocationLatitude",resultLocationLatitude);
-               intent.putExtra("Query",query);
-               startActivity(intent);
+                final PopupWindow popupWindow = new PopupWindow();
+                popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+                popupWindow.setFocusable(true);
+                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.popup,null);
+                popupWindow.setContentView(view);
+                popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
+                /**
+                 * 通过异步消息处理 得到loading加载效果
+                 */
+                final Handler handler=new Handler(){
+
+                    @Override
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        if(msg.what==0) {
+                            Intent intent = new Intent(SearchActivity.this, SearchResultActivity.class);
+
+                            intent.putExtra("ResultLocationLongitude", resultLocationLongitude);
+                            intent.putExtra("ResultLocationLatitude", resultLocationLatitude);
+                            intent.putExtra("Query", query);
+                            startActivity(intent);
+                        }
+                    }
+
+                };
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        popupWindow.dismiss();
+                        Message message=new Message();
+                        message.what=0;
+                        handler.sendMessage(message);
+                    }
+                },2000);
+
+
                 return true;
             }
 
@@ -159,13 +265,35 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
                 sugAdapter.setOnItemClickListener(new SugAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
+                        boolean isAddHistory=true; //判断是否加入搜索历史
                         SuggestionResult.SuggestionInfo suggestionInfo=resl.get(position);
+
+
                         if(suggestionInfo.getPt()!=null) {
+                            List<SearchHistory> historyListCompare= LitePal.findAll(SearchHistory.class);
+                            for(SearchHistory history:historyListCompare){
+                                if(suggestionInfo.key.equals(history.getName())){
+                                    isAddHistory=false;
+                                    break;
+                                }
+                            }
+                        //对数据库进行操作，将推荐搜索点击历史存入数据库
+                          if(isAddHistory) { //去重判断
+                              SearchHistory history = new SearchHistory();
+                              history.setLatitude(suggestionInfo.getPt().latitude);
+                              history.setLongitude(suggestionInfo.getPt().longitude);
+                              history.setUid(suggestionInfo.getUid());
+                              history.setName(suggestionInfo.key);
+                              history.setCity(suggestionInfo.getCity());
+                              history.setDistrict(suggestionInfo.getDistrict());
+                              history.save();
+                          }
                             Intent intent=new Intent(SearchActivity.this,SearchResultActivity.class);
                             intent.putExtra("Latitude",suggestionInfo.getPt().latitude);
                             intent.putExtra("Longitude",suggestionInfo.getPt().longitude);
                             intent.putExtra("locationUid",suggestionInfo.getUid());
                             intent.putExtra("SuggestKey",suggestionInfo.key);
+                            Log.d("search", "onItemClick: "+suggestionInfo.key);
                             startActivity(intent);
                             recyclerView.setVisibility(View.GONE);
                         }
@@ -250,6 +378,41 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
                  intentsupermarket.putExtra("ResultLocationLatitude",resultLocationLatitude);
                  startActivity(intentsupermarket);
                  break;
+             case R.id.remove_history_text:
+                 /**
+                  * 点击弹出dialog确认是否清除历史纪录
+                  */
+                 AlertDialog.Builder builder=new AlertDialog.Builder(SearchActivity.this);
+                 builder.setTitle("确认");
+                 builder.setMessage("你将清空历史纪录");
+                 builder.setCancelable(true);
+                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialogInterface, int i) {
+                         LitePal.deleteAll(SearchHistory.class);
+                         //先删除再查询
+                         List<SearchHistory> historyList= LitePal.findAll(SearchHistory.class);
+                         List<SuggestionResult.SuggestionInfo> historySuggest=new ArrayList<>();
+                         for(SearchHistory history:historyList){
+                             SuggestionResult.SuggestionInfo mySuggestionInfo=new SuggestionResult.SuggestionInfo();
+                             mySuggestionInfo.setKey(history.getName());
+                             mySuggestionInfo.setPt(new LatLng(history.getLatitude(),history.getLongitude()));
+                             mySuggestionInfo.setUid(history.getUid());
+                             mySuggestionInfo.setCity(history.getCity());
+                             mySuggestionInfo.setDistrict(history.getDistrict());
+                             historySuggest.add(mySuggestionInfo);
+                         }
+                         sugAdapter=new SugAdapter(historySuggest);
+                         searchHistoryRecycler.setAdapter(sugAdapter);
+                         sugAdapter.notifyDataSetChanged();
+                         historyText.setVisibility(View.GONE);
+                         removeHistoryText.setVisibility(View.GONE);
+                     }
+                 });
+                 builder.show();
+                 break;
+
+
               default:
                   break;
          }

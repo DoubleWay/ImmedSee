@@ -206,4 +206,40 @@
       android:layout_height="1.5dp"
       android:layout_marginTop="10dp"
       android:background="#e3e7f1"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+  <TextView
+      android:id="@+id/history_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="历史搜索"
+      android:textStyle="italic"
+      android:textSize="15dp"
+      android:visibility="gone"
+      />
+
+  <TextView
+      android:id="@+id/remove_history_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="210dp"
+      android:text="清空历史纪录"
+      android:textSize="15dp"
+      android:visibility="gone"
+      android:textStyle="italic" />
+
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1.5dp"
+        android:background="#e3e7f1"/>
+  <android.support.v7.widget.RecyclerView
+      android:id="@+id/search_history"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+  </android.support.v7.widget.RecyclerView>
+
 </LinearLayout>

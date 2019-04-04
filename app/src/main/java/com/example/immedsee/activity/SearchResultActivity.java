@@ -127,8 +127,7 @@ public class SearchResultActivity extends AppCompatActivity {
         suggestKey=intent.getStringExtra("SuggestKey");
         resultLocationLatitude=intent.getDoubleExtra("ResultLocationLatitude",0);
         resultLocationLongitude=intent.getDoubleExtra("ResultLocationLongitude",0);
-        Log.d("this", "SearchResultLongitude: "+resultLocationLongitude);
-        Log.d("this", "SearchResultLatitude: "+resultLocationLatitude);
+
 
 
 

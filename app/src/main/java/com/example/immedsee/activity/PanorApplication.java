@@ -7,6 +7,9 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.litepal.LitePal;
+import org.litepal.LitePalApplication;
+
 /**
  * 获得全景需要集成的applicatio
  */
@@ -17,6 +20,7 @@ public class PanorApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LitePal.initialize(this);
         mInstance = this;
         initEngineManager(this);
     }
