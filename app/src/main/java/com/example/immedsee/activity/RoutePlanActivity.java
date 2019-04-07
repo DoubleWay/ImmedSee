@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.Address;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
@@ -25,25 +24,14 @@ import com.baidu.mapapi.bikenavi.adapter.IBRoutePlanListener;
 import com.baidu.mapapi.bikenavi.model.BikeRoutePlanError;
 import com.baidu.mapapi.bikenavi.params.BikeNaviLaunchParam;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.Marker;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.core.RouteLine;
 import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeOption;
-import com.baidu.mapapi.search.geocode.GeoCodeResult;
-import com.baidu.mapapi.search.geocode.GeoCoder;
-import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.search.route.BikingRouteLine;
 import com.baidu.mapapi.search.route.BikingRoutePlanOption;
 import com.baidu.mapapi.search.route.BikingRouteResult;
@@ -101,7 +89,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
     private String locationCity;
     private double resultLatitude; //接收目标地址的经纬度
     private double resultLongitude;
-
     private double mLatitude;//保存初次定位后的位置信息
    private double mLongitude;
    private BDLocation mBDLocation;
@@ -138,19 +125,45 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         // 初始化搜索模块，注册事件监听
         mSearch = RoutePlanSearch.newInstance();
         mSearch.setOnGetRoutePlanResultListener(this);
-        requestLocation(); //开启定位
-        Intent intent=getIntent();
+
+        final Intent intent=getIntent();
         resultCity=intent.getStringExtra("ResultCity");
         resultAddress=intent.getStringExtra("ResultAddress");
         resultName=intent.getStringExtra("ResultName");
         resultLatitude=intent.getDoubleExtra("ResultLatitude",0);
         resultLongitude=intent.getDoubleExtra("ResultLongitude",0);
+        locationAddress=intent.getStringExtra("LocationAddress");
+        mLatitude=intent.getDoubleExtra("mLatitude",0);
+        mLongitude=intent.getDoubleExtra("mLongitude",0);
+        requestLocation(); //开启定位
         editSt = (EditText) findViewById(R.id.start);
         editEn = (EditText) findViewById(R.id.end);
         editEn.setText(resultAddress);
+        editSt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1=new Intent(RoutePlanActivity.this,RouteSearchActivity.class);
+                intent1.putExtra("LocationCity",locationCity);
+                intent1.putExtra("LocationAddress",locationAddress);
+                intent1.putExtra("mLatitude",mLatitude);
+                intent1.putExtra("mLongitude",mLongitude);
+                startActivity(intent1);
+            }
+        });
+        editEn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2=new Intent(RoutePlanActivity.this,RouteSearchActivity.class);
+                intent2.putExtra("LocationCity",locationCity);
+                intent2.putExtra("LocationAddress",locationAddress);
+                intent2.putExtra("mLatitude",mLatitude);
+                intent2.putExtra("mLongitude",mLongitude);
+                startActivity(intent2);
+            }
+        });
+
         if(resultAddress!=null) {
             editEn.setSelection(resultAddress.length());//将光标移到最后
-
         }
         Log.d("RoutePlan", "resultLatitude: "+resultLatitude);
         Log.d("RoutePlan", "resultLongitude: "+resultLongitude);
@@ -160,32 +173,6 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
 
     }
 
-    public void  Geo(){
-         String []addressEn=null;
-        GeoCoder geoCoder = GeoCoder.newInstance();
-        //设置反地理编码位置坐标
-        String address=editEn.getText().toString();
-        addressEn=address.split("市");
-        geoCoder.geocode(new GeoCodeOption()
-                .city(addressEn[0])
-                .address(addressEn[1]));
-        geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
-            @Override
-            public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
-                  resultLatitude=geoCodeResult.getLocation().latitude;
-                  resultLongitude=geoCodeResult.getLocation().longitude;
-                Log.d("RoutePlan", "resultLatitude: "+resultLatitude);
-                Log.d("RoutePlan", "resultLongitude: "+resultLongitude);
-
-            }
-
-            @Override
-            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-
-            }
-        });
-
-    }
     /**
      * 定位初始化方法
      */
@@ -214,11 +201,15 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         public void onReceiveLocation(BDLocation bdLocation) {
             if(bdLocation.getLocType()==BDLocation.TypeNetWorkLocation||bdLocation.getLocType()==BDLocation.TypeGpsLocation){
                 mBDLocation=bdLocation;
-                mLatitude=bdLocation.getLatitude();
-                mLongitude=bdLocation.getLongitude();
+                if(mLatitude==0&&mLongitude==0) {
+                    mLatitude = bdLocation.getLatitude();
+                    mLongitude = bdLocation.getLongitude();
+                }
                 //解决bdLocation.getAddrStr()过段时间值变为null的问题
                 if(isFirstLocate){
-                locationAddress=bdLocation.getAddrStr();
+                    if(locationAddress==null) {
+                        locationAddress = bdLocation.getAddrStr();
+                    }
                 locationCity=bdLocation.getCity();
                 isFirstLocate=false;
                 }
@@ -268,7 +259,7 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         mBtnNext.setVisibility(View.INVISIBLE);
         mBaidumap.clear(); //清除地图上画的路线
         // 处理搜索按钮响应
-
+        Log.d("RoutePlan", "searchButtonProcess: "+editEn.getText().toString());
 
         // 设置起终点信息，对于tranist search 来说，城市名无意义
         if(resultLatitude==0&&resultLongitude==0) {

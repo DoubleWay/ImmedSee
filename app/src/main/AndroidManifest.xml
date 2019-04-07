@@ -9,9 +9,9 @@
         android:normalScreens="false"
         android:resizeable="true"
         android:smallScreens="true" />
-<!--手机震动权限-->
+    <!-- 手机震动权限 -->
     <uses-permission android:name="android.permission.BODY_SENSORS" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -28,7 +28,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name="com.example.immedsee.activity.PanorApplication"
+        android:name=".activity.PanorApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -61,9 +61,10 @@
         <activity android:name=".activity.SearchActivity" />
         <activity android:name=".activity.SearchResultActivity" />
         <activity android:name=".activity.ResultDetailsActivity" />
-        <activity android:name=".activity.RoutePlanActivity"></activity>
-        <activity android:name=".activity.WNaviGuideActivity"></activity>
-        <activity android:name=".activity.BNaviGuideActivity"></activity>
+        <activity android:name=".activity.RoutePlanActivity" />
+        <activity android:name=".activity.WNaviGuideActivity" />
+        <activity android:name=".activity.BNaviGuideActivity" />
+        <activity android:name=".activity.RouteSearchActivity" />
     </application>
 
 </manifest>
