@@ -2,17 +2,28 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
-    android:background="#e3e7f1"
-    >
+    android:background="#e3e7f1">
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/icon_image"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/nav_icon"
+        android:src="@drawable/header_icon"
         android:layout_centerInParent="true"
+        app:civ_border_color="#000"
+        app:civ_border_width="1dp"
         android:layout_marginTop="25dp"
+        android:layout_marginBottom="5dp"
         />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/icon_image"
+        android:layout_centerHorizontal="true"
+        android:text="注册/登陆"
+        android:textStyle="bold|italic" />
 
     <TextView
         android:id="@+id/mail"

@@ -19,6 +19,10 @@ allprojects {
     repositories {
         google()
         jcenter()
+        //Bmob的maven仓库地址--必填
+        maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
+        ///导入ucorp图片裁剪需要的仓库
+        maven { url "https://jitpack.io" }
     }
 }
 

@@ -33,7 +33,7 @@
                 android:id="@+id/walk_guide"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                
+
                 android:layout_gravity="center"
                 android:layout_weight="1.0"
                 android:background="@drawable/button_style"

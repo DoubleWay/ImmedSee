@@ -6,4 +6,12 @@
     <color name="black_text">#333333</color>
     <color name="black_text2">#666666</color>
     <color name="blue">#1DA1F2</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colorTextBlack">#4D4D4D</color>
+    <color name="text_color">#808080</color>
+    <color name="line">#C8C8CB</color>
+    <color name="gray">#F4F4F4</color>
+    <color name="main_content">#4D4D4D</color>
+    <color name="black">#000000</color>
+    <color name="black80">#80000000</color>
 </resources>

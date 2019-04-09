@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_dialog_radius">
+
+        <TextView
+            android:id="@+id/addMemberTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/prompt"
+            android:textColor="#000"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/ll_addMember"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addMemberTitle"
+            android:layout_centerHorizontal="true"
+            android:minHeight="96dp"
+            android:padding="16dp"
+            android:background="@drawable/shape_btn_radius"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_promptText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prompt_permission"/>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/view_lineAddMemberDialogBottom"
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:layout_below="@id/ll_addMember"
+            android:layout_marginTop="16dp"
+            android:background="#F4F4F4"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/view_lineAddMemberDialogBottom"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:id="@+id/rl_setting"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/setting_to"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="0.4dp"
+                android:layout_height="match_parent"
+                android:background="#F4F4F4">
+
+            </View>
+
+            <RelativeLayout
+                android:id="@+id/rl_cancelNext"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/cancel_next"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>
