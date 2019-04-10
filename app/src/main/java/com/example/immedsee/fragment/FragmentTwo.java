@@ -23,28 +23,16 @@ import java.util.Random;
  * 邮箱：13558965844@163.com
  */
 public class FragmentTwo extends Fragment {
-    //测试数据
-    private Target[] targets={new Target("北京","我想知道北京长啥样"),new Target("南京","我想知道南京长啥样"),
-            new Target("四川","我想知道四川长啥样")};
-
-    private List<Target> targetList=new ArrayList<>();
-    private TargetAdapter adapter;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initFruit();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        RecyclerView recyclerView=getView().findViewById(R.id.recycle_view);
-        GridLayoutManager layoutManager=new GridLayoutManager(getActivity().getApplicationContext(),1);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter=new TargetAdapter(targetList);
-        recyclerView.setAdapter(adapter);
     }
 
     @Nullable
@@ -52,14 +40,5 @@ public class FragmentTwo extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_two,container,false);
         return view;
-    }
-
-    private void initFruit() {
-        targetList.clear();
-        for(int i=0;i<50;i++){
-            Random random=new Random();
-            int index=random.nextInt(targets.length);
-            targetList.add(targets[index]);
-        }
     }
 }

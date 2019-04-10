@@ -26,11 +26,13 @@ import com.example.immedsee.R;
 import com.example.immedsee.Utils.AppUtils;
 import com.example.immedsee.Utils.Constant;
 import com.example.immedsee.Utils.UiTools;
+import com.example.immedsee.Utils.UniqueCodeUtils;
 import com.example.immedsee.Utils.UriToPathUtil;
 import com.example.immedsee.dao.User;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.util.Set;
 
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
@@ -294,13 +296,16 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_SELECT_FILE) {
                 Uri uri = data.getData();
+
                 if (uri != null) {
-                    File fileTemp = new File(Constant.basePath + File.separator + "temp.png");
+                    //给生成的文件加上随机数来区别，以解决图片裁剪后界面上没有变化的bug
+                    File fileTemp = new File(Constant.basePath + File.separator + "temp"+UniqueCodeUtils.genSimplePWD()+".png");
+                    Log.d("this", "onActivityResult: hhhhhhhhh"+ UniqueCodeUtils.genSimplePWD());
                     if (fileTemp.exists()) {
                         fileTemp.delete();
                     }
                     UCrop.of(uri, Uri.fromFile(fileTemp))
-                            .withAspectRatio(1, 1)
+                           .withAspectRatio(1, 1)
                             .withMaxResultSize(512, 512)
                             .start(this);
                     /*bfile = new BmobFile(new File(UriToPathUtil.getImageAbsolutePath(this,uri)));
@@ -309,17 +314,27 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             if (requestCode == UCrop.REQUEST_CROP) {
-                Log.i("MineActivity", "处理完成");
-                Uri resultUri = UCrop.getOutput(data);
+                Log.d("this", "处理完成");
+                final Uri resultUri = UCrop.getOutput(data);
                 //这里的resultUri.getPath()获取到的是图片的绝对路径
-                Log.e("MineActivity", "resultUri.getPath()=" + resultUri.getPath());
-                bfile = new BmobFile(new File(resultUri.getPath()));
+                Log.d("this", "resultUri.getPath()=" + resultUri.getPath());
+
                 setAvatar(resultUri.getPath());
+
+                bfile = new BmobFile(new File(resultUri.getPath()));
             } else if (resultCode == UCrop.RESULT_ERROR) {
                 Throwable cropError = UCrop.getError(data);
-                Log.e("MineActivity",  "剪裁错误：" + cropError.getMessage());
+                Log.e("this", "剪裁错误：" + cropError.getMessage());
             }
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bfile != null) {
+            bfile.getLocalFile().delete();
+        }
     }
 }

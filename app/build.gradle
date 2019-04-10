@@ -31,8 +31,8 @@ dependencies {
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'cn.bmob.android:bmob-sdk:3.5.5'
     implementation 'cn.bmob.android:http-legacy:1.0'
-    implementation('com.github.yalantis:ucrop:2.2.2') {//这个里面的okio会和bmob的里面的冲突，这样写可以解决。
-        //里面的okhttp3会和项目里的okhttp3冲突 也要排除
+    implementation('com.github.yalantis:ucrop:2.2.2') {//这个里面的okio会和bmob的里面的冲突，这样写可以解决,里面的okhttp3会和项目里的okhttp3冲突 也要排除
+
         exclude module: 'okio'
         exclude module: 'okhttp'
     }
