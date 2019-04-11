@@ -80,8 +80,8 @@ public class FragmentThree extends Fragment {
                 BmobUser.logOut();   //清除缓存用户对象
                 AppUtils.setAvatarFilePath("");
                 Constant.user = null;
-                userSignature.setText("我要成仙");
-                userName.setText("DoubleWay");
+                userSignature.setText("");
+                userName.setText("");
                 loginText.setVisibility(View.VISIBLE);
                 setDefaultAvatar();
             }

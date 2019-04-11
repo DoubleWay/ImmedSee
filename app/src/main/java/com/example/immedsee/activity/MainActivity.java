@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.baidu.location.LocationClient;
 import com.example.immedsee.R;
+import com.example.immedsee.Utils.UiTools;
 import com.example.immedsee.fragment.FragmentOne;
 import com.example.immedsee.fragment.FragmentThree;
 import com.example.immedsee.fragment.FragmentTwo;
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *视线双击两次退出app
+     *实现双击两次退出app
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

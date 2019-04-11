@@ -41,6 +41,7 @@ import com.example.immedsee.dao.SearchHistory;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity  implements View.OnClickListener{
@@ -133,6 +134,7 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
             historyText.setVisibility(View.VISIBLE);
             removeHistoryText.setVisibility(View.VISIBLE);
         }
+        Collections.reverse(historyList);//重要，将list的排列顺序倒置
         final List<SuggestionResult.SuggestionInfo> historySuggest=new ArrayList<>();
         for(SearchHistory history:historyList){
             SuggestionResult.SuggestionInfo mySuggestionInfo=new SuggestionResult.SuggestionInfo();

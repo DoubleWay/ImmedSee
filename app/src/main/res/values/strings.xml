@@ -15,7 +15,6 @@
     <string name="login_successful">登录成功</string>
     <string name="login_error">登录失败</string>
     <string name="login_error_name_or_password_incorrect">用户名或密码错误</string>
-    <string name="registerAccount">戳这里，成为我的后宫吧少女</string>
     <string name="prompt_userName">User</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_password_confirm">Confirm_Password</string>
@@ -74,4 +73,12 @@
     <string name="cancel_next">下次再说</string>
     <string name="prompt_permission">您拒绝了该项功能所需权限的申请，将不能使用该功能，如您需要使用，请前往设置或安全中心开启权限后重新操作</string>
     <string name="codes_error">验证码错误</string>
+    <string name="postUP_success">帖子发布成功</string>
+    <string name="postUP_error">帖子发布失败</string>
+    <string name="postSend_loading">帖子正在发布中</string>
+    <string name="please_login">您还没有登陆，请登陆后使用</string>
+    <string name="please_input_your_title">请填写标题</string>
+    <string name="please_input_your_content">请填写内容</string>
+    <string name="please_input_your_money">请输入悬赏值</string>
+    <string name="please_check_your_money">你付出的悬赏值不能大于你拥有的即视币</string>
 </resources>

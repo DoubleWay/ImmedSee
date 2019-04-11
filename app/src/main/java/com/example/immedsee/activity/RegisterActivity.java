@@ -112,7 +112,7 @@ public class RegisterActivity extends AppCompatActivity {
         user.setByName(name);
         user.setPassword(pwd);
         user.setSex("保密");
-        user.setMoney(0);
+        user.setMoney(1000);
         user.setSignature("他很懒，什么都没有写");
 
         user.signUp(new SaveListener<User>() {

@@ -6,6 +6,7 @@ import cn.bmob.v3.datatype.BmobFile;
 /**
  * DoubleWay on 2019/4/8:15:48
  * 邮箱：13558965844@163.com
+ * 用户表
  */
 public class User extends BmobUser {
 

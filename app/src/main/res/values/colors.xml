@@ -14,4 +14,5 @@
     <color name="main_content">#4D4D4D</color>
     <color name="black">#000000</color>
     <color name="black80">#80000000</color>
+    <color name="dark_blue">#2196F3</color>
 </resources>

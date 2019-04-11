@@ -9,7 +9,7 @@
         android:id="@+id/register_toolBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#e3e7f1"
+        android:background="#00bdaa"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         >

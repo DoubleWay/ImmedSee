@@ -71,13 +71,16 @@
         <activity android:name=".activity.BNaviGuideActivity" />
         <activity android:name=".activity.RouteSearchActivity" />
         <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.MineActivity"/>
+        <activity android:name=".activity.MineActivity" />
 
-        <!--配置导入的ucorp图片裁剪activity-->
+        <!-- 配置导入的ucorp图片裁剪activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.PostDetailsActivity" />
+        <activity android:name=".activity.PostAuthorActivity" />
+        <activity android:name=".activity.CommentActivity"></activity>
     </application>
 
 </manifest>
