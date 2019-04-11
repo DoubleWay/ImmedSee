@@ -1,9 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.CommentActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/til_content"
+            app:errorEnabled="true"
+            app:counterEnabled="true"
+            app:counterMaxLength="80"
+            app:hintTextAppearance="@style/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+
+            <EditText
+
+                android:id="@+id/ed_contents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="标题"
+                android:textColor="@color/dark_blue"
+                android:textSize="18dp" />
+            <ImageView
+                android:id="@+id/edit_img"
+                android:background="@mipmap/addimg"
+                android:layout_width="60dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="right"
+                android:layout_height="60dp"
+                android:onClick="selectImage"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+    <com.example.immedsee.View.MultiImageView
+        android:id="@+id/multiImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        />
+</LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        style="@style/AlertDialog.AppCompat.Light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="43dp"
+        android:layout_marginEnd="43dp"
+        android:background="@color/colorPrimary"
+        android:src="@mipmap/edit_ok"
+        app:backgroundTint="#32dbc6"
+        app:elevation="5dp"
+        app:rippleColor="#ffffff" />
+
+
+</RelativeLayout>
