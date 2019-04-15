@@ -10,6 +10,8 @@ import android.widget.Toast;
 import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
+import cn.bmob.v3.Bmob;
+
 /**
  * 获得全景需要集成的applicatio
  */
@@ -21,6 +23,7 @@ public class PanorApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LitePal.initialize(this);
+        Bmob.initialize(this, "054691472ad9df302769cef111cd2442");
         mInstance = this;
         initEngineManager(this);
     }

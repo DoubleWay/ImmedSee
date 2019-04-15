@@ -4,10 +4,19 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
-
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/comment_toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#00bdaa"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:layout_scrollFlags="scroll|enterAlways|snap"
+        />
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_below="@+id/comment_toolBar"
     android:orientation="vertical"
     >
         <android.support.design.widget.TextInputLayout
@@ -22,10 +31,10 @@
 
             <EditText
 
-                android:id="@+id/ed_contents"
+                android:id="@+id/ed_comment_contents"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="标题"
+                android:hint="内容"
                 android:textColor="@color/dark_blue"
                 android:textSize="18dp" />
             <ImageView
@@ -61,7 +70,9 @@
         android:src="@mipmap/edit_ok"
         app:backgroundTint="#32dbc6"
         app:elevation="5dp"
-        app:rippleColor="#ffffff" />
+        app:rippleColor="#ffffff"
+        android:onClick="addComment"
+        />
 
 
 </RelativeLayout>

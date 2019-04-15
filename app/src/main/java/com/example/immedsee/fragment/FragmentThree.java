@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +46,8 @@ public class FragmentThree extends Fragment {
     public static final int REQUEST_CODE = 1;
     private final int REQUEST_CODE_UPDATE = 104;
     private final int REQUEST_CODE_PERMISSIONS = 1005;
-    Button logout;
+    RelativeLayout logout;
+
     private LoginDailogFragment fragment;
     private CircleImageView loginImage;
     private TextView userName;
@@ -65,7 +67,7 @@ public class FragmentThree extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_three,container,false);
-        logout=(Button)view.findViewById(R.id.logout);
+        logout=(RelativeLayout) view.findViewById(R.id.log_out);
         userName=(TextView)view.findViewById(R.id.username);
         userSignature=(TextView)view.findViewById(R.id.signature);
         loginText=(TextView)view.findViewById(R.id.login_text);

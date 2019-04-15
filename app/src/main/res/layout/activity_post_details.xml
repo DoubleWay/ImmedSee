@@ -2,123 +2,120 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/post_details_toolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00bdaa"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dip"
             android:background="#FFFFFF"
-            android:minHeight="125dp"
             android:descendantFocusability="blocksDescendants"
-            >
+            android:minHeight="125dp"
+            android:padding="12dip">
+
             <TextView
                 android:id="@+id/post_details_title"
                 style="@style/TextTheme"
-                android:textSize="24dp"
-                android:text="我想知道的很多"
                 android:layout_margin="4dp"
-                />
+                android:text="我想知道的很多"
+                android:textSize="24dp" />
+
             <TextView
                 android:id="@+id/post_details_content"
                 style="@style/TextTheme"
-                android:textSize="14dp"
                 android:layout_below="@+id/post_details_title"
-                android:text="十年之前，我不认识你 你不属于我，我们还是一样，陪在一个陌生人左右，走过渐渐熟悉的街头;十年之后，我们是朋友， 还可以问候，只是那种温柔，再也找不到拥抱的理由，情人最后难免沦为朋友。"
                 android:layout_margin="4dp"
-                />
-            <LinearLayout
-                android:layout_below="@+id/post_details_content"
-                android:gravity="right"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:text="∧"
-                    android:visibility="gone"
-                    android:onClick="gone_imgs"
-                    android:id="@+id/tv_show_gone1"
-                    android:textSize="15dp"
-                    android:layout_marginRight="5dp"
-                    android:textColor="@color/black"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:text="∨"
-                    android:visibility="gone"
-                    android:onClick="show_imgs"
-                    android:id="@+id/tv_show_gone2"
-                    android:textSize="15dp"
-                    android:layout_marginRight="5dp"
-                    android:textColor="@color/black"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                android:text="十年之前，我不认识你 你不属于我，我们还是一样，陪在一个陌生人左右，走过渐渐熟悉的街头;十年之后，我们是朋友， 还可以问候，只是那种温柔，再也找不到拥抱的理由，情人最后难免沦为朋友。"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:id="@+id/post_details_solved"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentEnd="true"
+
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="92dp"
+                android:src="@drawable/icon_solved" />
+
             <ImageView
                 android:id="@+id/comm_img"
-                android:visibility="gone"
-                android:layout_below="@+id/post_details_content"
                 android:layout_width="match_parent"
-                android:scaleType="fitXY"
+                android:layout_height="200dp"
+                android:layout_below="@+id/post_details_content"
                 android:onClick="showImg"
-                android:layout_height="200dp" />
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+
             <View
 
+                android:id="@+id/comm_view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:id="@+id/comm_view"
                 android:layout_below="@+id/comm_img"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginTop="5dp"
-                android:background="#dddddd"
-                />
+                android:background="#dddddd" />
+
             <LinearLayout
-                android:padding="2dp"
-                android:orientation="horizontal"
-                android:layout_below="@+id/comm_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/comm_view"
+                android:orientation="horizontal"
+                android:padding="2dp">
 
 
                 <TextView
-                    android:text="username"
-                    android:layout_gravity="center"
-                    android:textColor="@color/dark_blue"
                     android:id="@+id/post_details_user"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/item_action_love"
                     android:layout_alignParentStart="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginTop="10dp"
                     android:onClick="authorInfo"
-                    >
+                    android:text="username"
+                    android:textColor="@color/dark_blue">
 
                 </TextView>
+
                 <TextView
-                    android:text="80即视币"
-                    android:layout_gravity="center"
-                    android:textColor="@color/black80"
                     android:id="@+id/post_details_money"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginLeft="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/item_action_love"
-                    android:layout_alignParentStart="true">
+                    android:layout_alignParentStart="true"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="10dp"
+                    android:text="80即视币"
+                    android:textColor="@color/black80">
 
                 </TextView>
+
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:gravity="right"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="13dp"
-                    android:layout_height="wrap_content">
+                    android:gravity="right">
 
 
                     <TextView
@@ -126,52 +123,50 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_gravity="center"
                         android:layout_below="@id/post_details_content"
-                        android:drawableLeft="@mipmap/ic_action_comment"
-                        android:gravity="center"
-                        android:text="评论"
-                        android:textColor="#888888"
-                        android:layout_marginTop="4dp"
+                        android:layout_gravity="center"
                         android:layout_marginBottom="4dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
-                        android:onClick="addComment"
-                        />
+                        android:layout_marginTop="4dp"
+                        android:drawableLeft="@mipmap/ic_action_comment"
+                        android:gravity="center"
+                        android:text="评论"
+                        android:textColor="#888888" />
+
                     <TextView
                         android:id="@+id/post_details_share"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toLeftOf="@id/post_comment_number"
                         android:layout_below="@id/post_details_content"
-                        android:drawableLeft="@mipmap/ic_action_share"
-                        android:text="分享"
-                        android:textColor="#888888"
-                        android:gravity="center"
-                        android:layout_marginTop="4dip"
                         android:layout_marginBottom="4dip"
                         android:layout_marginLeft="8dip"
                         android:layout_marginRight="8dip"
+                        android:layout_marginTop="4dip"
+                        android:layout_toLeftOf="@id/post_comment_number"
+                        android:drawableLeft="@mipmap/ic_action_share"
+                        android:gravity="center"
                         android:onClick="share"
-                        />
+                        android:text="分享"
+                        android:textColor="#888888" />
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#dddddd"
-            />
+            android:background="#dddddd" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/comm_recyclelist"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
 
 
-    <LinearLayout
+   <!-- <LinearLayout
         android:id="@+id/area_commit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -203,5 +198,18 @@
             android:padding="3dp"
             android:text="发表"
             android:textColor="@color/white" />
-    </LinearLayout>
+    </LinearLayout>-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="102dp"
+        android:onClick="addComment"
+        android:src="@mipmap/add_post"
+        app:backgroundTint="#ffffff"
+        app:elevation="8dp"
+        app:rippleColor="#32dbc6" />
 </RelativeLayout>

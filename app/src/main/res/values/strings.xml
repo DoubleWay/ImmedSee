@@ -81,4 +81,13 @@
     <string name="please_input_your_content">请填写内容</string>
     <string name="please_input_your_money">请输入悬赏值</string>
     <string name="please_check_your_money">你付出的悬赏值不能大于你拥有的即视币</string>
+    <string name="please_choose_images">请挑选图片后再发布</string>
+    <string name="commentUP_success">评论发布成功</string>
+    <string name="commentUP_error">评论发布失败</string>
+    <string name="commentSend_loading">评论正在发布中</string>
+    <string name="post_end_error_user">不是你的帖子 无法结贴</string>
+    <string name="post_end">本悬赏帖已结帖</string>
+    <string name="post_delete_error">对不起，您无权删除别人的帖子</string>
+    <string name="post_delete_success">帖子删除成功</string>
+    <string name="post_delete_error2">帖子删除失败</string>
 </resources>

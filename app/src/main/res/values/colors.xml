@@ -15,4 +15,5 @@
     <color name="black">#000000</color>
     <color name="black80">#80000000</color>
     <color name="dark_blue">#2196F3</color>
+    <color name="red">#df0054</color>
 </resources>

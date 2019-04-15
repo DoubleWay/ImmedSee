@@ -17,6 +17,7 @@ import com.example.immedsee.Utils.DialogPrompt;
 import com.example.immedsee.Utils.UiTools;
 import com.example.immedsee.adapter.PostListAdapter;
 import com.example.immedsee.dao.Post;
+import com.example.immedsee.dao.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,7 @@ public class PostAuthorActivity extends AppCompatActivity {
     private TextView postAuthorSignature;
     private RecyclerView recyclerViewPost;
     private PostListAdapter postListAdapter;
-
+   private User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +48,21 @@ public class PostAuthorActivity extends AppCompatActivity {
         GridLayoutManager layoutManager=new GridLayoutManager(this,1);
         recyclerViewPost.setLayoutManager(layoutManager);
 
-        Post  post=(Post)getIntent().getSerializableExtra("post_data");
-        if(post!=null) {
+        /*Post  post=(Post)getIntent().getSerializableExtra("post_data");*/
+         user=(User)getIntent().getSerializableExtra("user");
+         if(user!=null){
+             UiTools.showSimpleLD(this,R.string.loading);
+             postAuthorName.setText(user.getByName());
+             postAuthorSignature.setText(user.getSignature());
+         }
+        //获得帖子发布人的头像
+        if (user.getAvatar() != null){
+            String fileUrl = user.getAvatar().getFileUrl();
+            setAvatar(fileUrl);
+        }else {
+            setDefaultAvatar();
+        }
+       /* if(post!=null) {
             UiTools.showSimpleLD(this,R.string.loading);
             Log.d("PostAuthorActivity", "onCreate: " + post.getAuthor().getByName());
             postAuthorName.setText(post.getAuthor().getByName());
@@ -60,13 +74,13 @@ public class PostAuthorActivity extends AppCompatActivity {
             }else {
                 setDefaultAvatar();
             }
-        }
-        initPostData(post);
+        }*/
+        initPostData();
     }
 
-    private void initPostData(Post post) {
+    private void initPostData() {
         BmobQuery<Post> query=new BmobQuery<>();
-        query.addWhereEqualTo("author",post.getAuthor());
+        query.addWhereEqualTo("author",user);
         query.include("author");
         query.findObjects(new FindListener<Post>() {
             @Override

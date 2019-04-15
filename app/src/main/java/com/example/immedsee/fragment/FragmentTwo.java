@@ -27,6 +27,7 @@ import com.example.immedsee.adapter.PostListAdapter;
 import com.example.immedsee.dao.Post;
 import com.example.immedsee.dao.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,10 +60,7 @@ public class FragmentTwo extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
+
 
     @Nullable
     @Override
@@ -75,8 +73,11 @@ public class FragmentTwo extends Fragment {
         recyclerViewPost=(RecyclerView)view.findViewById(R.id.post_recycle_view);
         GridLayoutManager layoutManager=new GridLayoutManager(getActivity(),1);
         recyclerViewPost.setLayoutManager(layoutManager);
+
+
        /* User  user=BmobUser.getCurrentUser(User.class);*/
-        setPostInfo();
+        UiTools.showSimpleLD(getContext(),R.string.loading);
+
         addPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,13 +104,21 @@ public class FragmentTwo extends Fragment {
         });
         return view;
     }
+//有问题，每次重新加载的时候都会刷新的焦点都会重回第一项
+    @Override
+    public void onStart() {
+
+        super.onStart();
+        setPostInfo();
+    }
 
     /**
      * 加载post帖子列表
      */
     private void setPostInfo() {
-        UiTools.showSimpleLD(getContext(),R.string.loading);
+
         BmobQuery<Post> query=new BmobQuery<>();
+        /*query.addWhereEqualTo("deleteTag",0);*/
         query.include("author"); //查询包括他的作者信息
         query.findObjects(new FindListener<Post>() {
             @Override
@@ -117,9 +126,16 @@ public class FragmentTwo extends Fragment {
                 UiTools.closeSimpleLD();
                 if(e==null){
                     Collections.reverse(list);//重要，将list的排列顺序倒置
+                    //因为再外部进行条件查询好像有问题，查询总是失败，所以在查询后用一个list进行筛选
+                    final List<Post>list2=new ArrayList<>();
+                    for(Post post:list){
+                        if(post.getDeleteTag()==0){
+                            list2.add(post);
+                        }
+                    }
                    /* Log.d("fragmenttwo", "done: "+list.get(0).getAuthor().getObjectId());
                     Log.d("fragmenttwo", "done: "+list.get(0).getAuthor().getSignature());*/
-                    postListAdapter=new PostListAdapter(list);
+                    postListAdapter=new PostListAdapter(list2);
                     recyclerViewPost.setAdapter(postListAdapter);
                     postListAdapter.notifyDataSetChanged();
 
@@ -128,7 +144,7 @@ public class FragmentTwo extends Fragment {
                             public void onItemClick(View view, int position) {
                                 if(Constant.user!=null) {
                                     Intent toPostDetailsIntent = new Intent(getContext(), PostDetailsActivity.class);
-                                    toPostDetailsIntent.putExtra("post_data",list.get(position));
+                                    toPostDetailsIntent.putExtra("post_data",list2.get(position));
                                     startActivity(toPostDetailsIntent);
                                 }else {
                                     DialogPrompt dialogPrompt=new DialogPrompt(getActivity(),R.string.please_login);
@@ -136,6 +152,9 @@ public class FragmentTwo extends Fragment {
                                 }
                             }
                         });
+                }else {
+                    Log.d("FragmentTwo", "done: 查询失败");
+                    Log.d("FragmentTwo", "done: "+e.toString());
                 }
             }
         });
@@ -146,6 +165,7 @@ public class FragmentTwo extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==REQUEST_CODE ){
+            UiTools.closeSimpleLD();
             setPostInfo();
             postAddDailogFragment.dismiss();
         }

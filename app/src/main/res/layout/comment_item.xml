@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:id="@+id/post_card_view"
+    app:cardCornerRadius="7dp"
+    app:cardElevation="3dp"
+    android:elevation="12dp"
+    android:layout_margin="1dp">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:descendantFocusability="blocksDescendants"
+        android:minHeight="125dp"
+        android:padding="12dip">
+
+        <TextView
+            android:id="@+id/comment_content"
+            style="@style/TextTheme"
+            android:layout_margin="4dp"
+            android:text="十年之前，我不认识你 你不属于我，我们还是一样，陪在一个陌生人左右，走过渐渐熟悉的街头;十年之后，我们是朋友， 还可以问候，只是那种温柔，再也找不到拥抱的理由，情人最后难免沦为朋友。"
+            android:textSize="14dp" />
+
+        <com.example.immedsee.View.MultiImageView
+            android:id="@+id/comment_multiImageView"
+            android:layout_below="@+id/comment_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            />
+
+        <ImageView
+            android:id="@+id/comm_img"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_below="@+id/comment_multiImageView"
+            android:onClick="showImg"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <View
+
+            android:id="@+id/comm_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/comm_img"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="5dp"
+            android:background="#dddddd" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/comm_view"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+
+            <TextView
+                android:id="@+id/comment_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/item_action_love"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="10dp"
+                android:text="username"
+                android:textColor="@color/dark_blue">
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/comment_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/item_action_love"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="10dp"
+                android:text="2017-12-11"
+                android:textColor="@color/black80">
+
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:gravity="right">
+
+                <TextView
+                    android:id="@+id/comment_isLove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/comment_content"
+                    android:layout_marginBottom="4dip"
+                    android:layout_marginLeft="8dip"
+                    android:layout_marginRight="8dip"
+                    android:layout_marginTop="4dip"
+                    android:drawableLeft="@mipmap/ic_action_love"
+                    android:gravity="center"
+                    android:onClick="share"
+                    android:text="满意"
+                    android:textColor="#888888" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#dddddd" />
+
+</android.support.v7.widget.CardView>
+

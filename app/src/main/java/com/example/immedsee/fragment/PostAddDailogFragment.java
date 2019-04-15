@@ -124,6 +124,7 @@ public class PostAddDailogFragment extends DialogFragment implements View.OnClic
                 post.setPostContent(content);
                 post.setPostMoney(money);
                 post.setEnd(false);
+                post.setDeleteTag(0);
                 post.setAuthor(user);
                 post.save(new SaveListener<String>() {
                     @Override

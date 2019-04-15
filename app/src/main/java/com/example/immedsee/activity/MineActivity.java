@@ -198,7 +198,7 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                     if (bfile != null) {
                         AppUtils.setAvatarFilePath("");
                     }
-                    Toast.makeText(MineActivity.this, R.string.update_complete, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MineActivity.this,  R.string.update_complete, Toast.LENGTH_SHORT).show();
                     MineActivity.this.setResult(RESULT_OK);
                     MineActivity.this.finish();
                 } else {

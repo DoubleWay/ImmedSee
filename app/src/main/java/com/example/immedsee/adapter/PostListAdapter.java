@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,6 +15,8 @@ import com.example.immedsee.R;
 import com.example.immedsee.dao.Post;
 
 import java.util.List;
+
+import cn.bmob.v3.b.I;
 
 /**
  * DoubleWay on 2019/4/10:16:42
@@ -29,6 +32,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
            private TextView postMoney;
            private TextView postAuthorName;
            private TextView postCreateTime;
+           private ImageView postSolved;
            private CardView postCardView;
 
         public ViewHolder(View itemView) {
@@ -37,6 +41,7 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
             postMoney=(TextView)itemView.findViewById(R.id.post_money);
             postAuthorName=(TextView)itemView.findViewById(R.id.post_authorName);
             postCreateTime=(TextView)itemView.findViewById(R.id.post_CreateTime);
+            postSolved=(ImageView)itemView.findViewById(R.id.post_solved);
             postCardView=(CardView)itemView.findViewById(R.id.post_card_view);
         }
     }
@@ -62,7 +67,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
               holder.postMoney.setText(post.getPostMoney()+"");
               holder.postAuthorName.setText(post.getAuthor().getByName());
               holder.postCreateTime.setText(post.getCreatedAt());
-
+              if(post.isEnd()){
+                  holder.postSolved.setVisibility(View.VISIBLE);
+              }else {
+                  holder.postSolved.setVisibility(View.GONE);
+              }
               if(mOnItemClickListener!=null){
                   holder.postCardView.setOnClickListener(new View.OnClickListener() {
                       @Override
