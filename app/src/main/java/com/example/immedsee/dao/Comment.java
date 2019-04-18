@@ -15,7 +15,7 @@ public class Comment extends BmobObject {
     private User user;
     private Post post;
     private boolean isSolvde=false; //这个评论是否解决了问题
-    private int deleteTag=0;//这个评论是否被删除
+    private Integer deleteTag=0;//这个评论是否被删除
 
     public String getContent() {
         return content;

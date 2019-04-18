@@ -19,7 +19,7 @@ public class Post extends BmobObject implements Serializable {
     private String postTitle;//帖子的标题
     private boolean isEnd;//是否结贴；
     private double postMoney;//悬赏贴的价钱
-    private int deleteTag=0;//是否删除帖子
+    private Integer deleteTag=0;//是否删除帖子
 
     public User getAuthor() {
         return author;

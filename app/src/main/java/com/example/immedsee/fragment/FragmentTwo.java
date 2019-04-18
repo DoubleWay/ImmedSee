@@ -77,7 +77,7 @@ public class FragmentTwo extends Fragment {
 
        /* User  user=BmobUser.getCurrentUser(User.class);*/
         UiTools.showSimpleLD(getContext(),R.string.loading);
-
+        setPostInfo();
         addPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

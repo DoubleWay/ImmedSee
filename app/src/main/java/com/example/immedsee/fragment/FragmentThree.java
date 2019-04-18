@@ -1,6 +1,7 @@
 package com.example.immedsee.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -26,15 +27,18 @@ import com.example.immedsee.Utils.Constant;
 import com.example.immedsee.Utils.DialogPromptPermission;
 import com.example.immedsee.Utils.PermissionUtils;
 import com.example.immedsee.activity.MineActivity;
+import com.example.immedsee.activity.PostAuthorActivity;
 import com.example.immedsee.dao.User;
 
 import java.io.File;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
+import cn.bmob.v3.listener.QueryListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -46,8 +50,9 @@ public class FragmentThree extends Fragment {
     public static final int REQUEST_CODE = 1;
     private final int REQUEST_CODE_UPDATE = 104;
     private final int REQUEST_CODE_PERMISSIONS = 1005;
-    RelativeLayout logout;
-
+    private RelativeLayout logout;
+    private RelativeLayout myPost;
+    private RelativeLayout  myMoney;
     private LoginDailogFragment fragment;
     private CircleImageView loginImage;
     private TextView userName;
@@ -68,6 +73,8 @@ public class FragmentThree extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_three,container,false);
         logout=(RelativeLayout) view.findViewById(R.id.log_out);
+        myPost=(RelativeLayout)view.findViewById(R.id.user_post);
+        myMoney=(RelativeLayout)view.findViewById(R.id.user_money);
         userName=(TextView)view.findViewById(R.id.username);
         userSignature=(TextView)view.findViewById(R.id.signature);
         loginText=(TextView)view.findViewById(R.id.login_text);
@@ -88,6 +95,8 @@ public class FragmentThree extends Fragment {
                 setDefaultAvatar();
             }
         });
+
+     //登陆或者进入信息详情
         loginImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,6 +108,32 @@ public class FragmentThree extends Fragment {
                     Intent toMineIntent=new Intent(getActivity(), MineActivity.class);
                     startActivityForResult(toMineIntent,REQUEST_CODE_UPDATE);
                 }
+            }
+        });
+ //查看我的帖子
+        myPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toAuthorInfoIntent=new Intent(getContext(),PostAuthorActivity.class);
+                toAuthorInfoIntent.putExtra("user",Constant.user);
+                startActivity(toAuthorInfoIntent);
+            }
+        });
+//查询剩余的财富
+        myMoney.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BmobQuery<User> query=new BmobQuery<>();
+                query.getObject(Constant.user.getObjectId(), new QueryListener<User>() {
+                    @Override
+                    public void done(User user, BmobException e) {
+                        Log.d("FragmentThree", "done: "+user.getMoney());
+                        AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+                        builder.setTitle("财富");
+                        builder.setMessage("您的即视币剩余为："+user.getMoney());
+                        builder.show();
+                    }
+                });
             }
         });
         return view;

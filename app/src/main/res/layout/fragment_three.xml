@@ -9,13 +9,6 @@
         android:orientation="vertical"
 
         >
-        <!--<android.support.design.widget.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/nav_herder"
-            app:menu="@menu/nav_menu" />-->
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
@@ -103,7 +96,7 @@
 
 
                     <RelativeLayout
-                        android:id="@+id/use_back_to_service"
+                        android:id="@+id/user_post"
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
                         android:background="@color/white"
@@ -117,7 +110,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:text="反馈"
+                            android:text="我的帖子"
                             android:textColor="@color/black"
                             android:textSize="14sp" />
                     </RelativeLayout>

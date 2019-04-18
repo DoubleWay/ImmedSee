@@ -28,13 +28,19 @@ import com.example.immedsee.activity.PostDetailsActivity;
 import com.example.immedsee.activity.SearchActivity;
 import com.example.immedsee.dao.Comment;
 import com.example.immedsee.dao.Post;
+import com.example.immedsee.dao.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.AsyncCustomEndpoints;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.CloudCodeListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
@@ -184,7 +190,42 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
                                                   }
                                               }
                                           });
+
+                                          /**
+                                           * 因为Bmob后端云，无法在客户端修改user表中其他用户的数据，你没有登陆就无法修改，所以通过
+                                           * 云函数，在后端云上对user表进行修改
+                                           */
+                                          double money=comment.getUser().getMoney()+list.get(0).getPostMoney();
+                                          JSONObject params = new JSONObject();
+                                          try {
+                                            // params.put("name",comment.getUser().getUsername());
+                                              params.put("id",comment.getUser().getObjectId());
+                                             // params.put("password","123456");
+                                              params.put("money",money);
+                                              Log.d("moneyManage", " " +comment.getUser().getMoney());
+                                              Log.d("moneyManage", " " +list.get(0).getPostMoney());
+                                              Log.d("moneyManage", " " +money);
+                                          } catch (JSONException e1) {
+                                              e1.printStackTrace();
+                                          }
+                                          AsyncCustomEndpoints ace = new AsyncCustomEndpoints();
+                                    //第一个参数是云函数的方法名称，第二个参数是上传到云函数的参数列表（JSONObject cloudCodeParams），第三个参数是回调类
+                                          ace.callEndpoint("moneyManage", params, new CloudCodeListener() {
+                                              @Override
+                                              public void done(Object object, BmobException e) {
+                                                  if (e == null) {
+                                                      String result = object.toString();
+                                                      Log.d("moneyManage", " " + result);
+                                                  } else {
+                                                      Log.d("moneyManage", " " + e.getMessage());
+                                                  }
+                                              }
+                                           });
+                                          
                                           comment.setSolvde(true);
+                                          Log.d("CommentListAdapter", "done: 评论作者的财富为"+comment.getUser().getMoney());
+                                          Log.d("CommentListAdapter", "done: 帖子价值为"+list.get(0).getPostMoney());
+                                          /*comment.getUser().setMoney(comment.getUser().getMoney()+list.get(0).getPostMoney());*/
                                           //点击满意后，图标变红，将comment的是否解决问题改为ture，然后存入服务器
                                           comment.update(new UpdateListener() {
                                               @Override
