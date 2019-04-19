@@ -221,7 +221,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
                                                   }
                                               }
                                            });
-                                          
+
                                           comment.setSolvde(true);
                                           Log.d("CommentListAdapter", "done: 评论作者的财富为"+comment.getUser().getMoney());
                                           Log.d("CommentListAdapter", "done: 帖子价值为"+list.get(0).getPostMoney());

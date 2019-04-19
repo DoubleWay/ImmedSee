@@ -86,7 +86,7 @@
                             android:layout_centerVertical="true"
                             android:text="财富"
                             android:textColor="@color/black"
-                            android:textSize="14sp" />
+                            android:textSize="20sp" />
                     </RelativeLayout>
 
                     <View
@@ -112,7 +112,7 @@
                             android:layout_centerVertical="true"
                             android:text="我的帖子"
                             android:textColor="@color/black"
-                            android:textSize="14sp" />
+                            android:textSize="20sp" />
                     </RelativeLayout>
 
                     <View
@@ -121,7 +121,7 @@
                         android:background="@color/gray"></View>
 
                     <RelativeLayout
-                        android:id="@+id/log_off"
+                        android:id="@+id/myPassword_reset"
                         android:layout_width="match_parent"
                         android:layout_height="58dp"
                         android:background="@color/white"
@@ -135,9 +135,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:text="注销账号"
+                            android:text="修改密码"
                             android:textColor="@color/black"
-                            android:textSize="14sp" />
+                            android:textSize="20sp" />
                     </RelativeLayout>
 
                     <View

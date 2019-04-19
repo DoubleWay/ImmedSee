@@ -48,12 +48,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class FragmentThree extends Fragment {
 
     public static final int REQUEST_CODE = 1;
+    public static final int REQUEST_CODE_PASSWORD_RESET = 2;
     private final int REQUEST_CODE_UPDATE = 104;
     private final int REQUEST_CODE_PERMISSIONS = 1005;
     private RelativeLayout logout;
     private RelativeLayout myPost;
     private RelativeLayout  myMoney;
+    private RelativeLayout myPasswordReset;
     private LoginDailogFragment fragment;
+    private PasswordResetDialogFragment passwordResetDialogFragment;
     private CircleImageView loginImage;
     private TextView userName;
     private TextView userSignature;
@@ -75,6 +78,7 @@ public class FragmentThree extends Fragment {
         logout=(RelativeLayout) view.findViewById(R.id.log_out);
         myPost=(RelativeLayout)view.findViewById(R.id.user_post);
         myMoney=(RelativeLayout)view.findViewById(R.id.user_money);
+        myPasswordReset=(RelativeLayout)view.findViewById(R.id.myPassword_reset);
         userName=(TextView)view.findViewById(R.id.username);
         userSignature=(TextView)view.findViewById(R.id.signature);
         loginText=(TextView)view.findViewById(R.id.login_text);
@@ -136,6 +140,22 @@ public class FragmentThree extends Fragment {
                 });
             }
         });
+//修改登陆密码
+        myPasswordReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(Constant.user!=null) {
+                    passwordResetDialogFragment = new PasswordResetDialogFragment();
+                    passwordResetDialogFragment.setTargetFragment(FragmentThree.this, REQUEST_CODE_PASSWORD_RESET);
+                    passwordResetDialogFragment.show(getFragmentManager(), "passwordReset");
+                }else {
+                    Toast.makeText(getContext(),"您还没有登陆，请先登陆后再操作",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
         return view;
     }
 
@@ -231,6 +251,11 @@ public class FragmentThree extends Fragment {
         if(requestCode == REQUEST_CODE_UPDATE){
             setUserInfo();
         }
+        if(requestCode==REQUEST_CODE_PASSWORD_RESET){
+            passwordResetDialogFragment.dismiss();
+            Log.d("passwordReset", "onActivityResult:hhhh ");
+        }
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
