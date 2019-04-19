@@ -136,6 +136,7 @@ public class PostAddDailogFragment extends DialogFragment implements View.OnClic
                             Intent intent= new Intent();
                             getTargetFragment().onActivityResult(FragmentTwo.REQUEST_CODE, Activity.RESULT_OK, intent);
                         }else {
+                            Log.d("PostAddDailogFragment", "done: "+e.toString());
                             DialogPrompt dialogPrompt=new DialogPrompt(getActivity(),R.string.postUP_error);
                             dialogPrompt.show();
                         }

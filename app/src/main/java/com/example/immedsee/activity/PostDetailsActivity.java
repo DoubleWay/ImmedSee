@@ -106,21 +106,24 @@ public class PostDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         User currentUser = BmobUser.getCurrentUser(User.class);
-                        Log.d("PostDetailsActivity", "done: "+currentUser.getMoney());
-                        if(!post.getAuthor().getUsername().equals(Constant.user.getUsername()) ){
-                            Log.d("PostDetailsActivity", "onClick:删除 "+post.getAuthor().getUsername());
-                            Log.d("PostDetailsActivity", "onClick:删除 "+Constant.user.getUsername());
+                        Log.d("PostDetailsActivity", "done1: "+currentUser.getMoney());
+                        if(!post.getAuthor().getUsername().equals(currentUser.getUsername()) ){
+                            /*Log.d("PostDetailsActivity", "onClick:删除 "+post.getAuthor().getUsername());
+                            Log.d("PostDetailsActivity", "onClick:删除 "+Constant.user.getUsername());*/
                             DialogPrompt dialogPrompt=new DialogPrompt(PostDetailsActivity.this,R.string.post_delete_error);
                             dialogPrompt.show();
                             return;
                         }else {
                             Log.d("PostDetailsActivity", "onClick:删除 ");
                             if(!post.isEnd()){
-
-                                Constant.user.setMoney(Constant.user.getMoney()+post.getPostMoney());
-                                Log.d("PostDetailsActivity", "done: "+Constant.user.getMoney());
-                                Log.d("PostDetailsActivity", "done: "+post.getPostMoney());
-                                Constant.user.update(new UpdateListener() {
+                               /* Log.d("PostDetailsActivity", "done2: "+currentUser.getMoney());
+                                Log.d("PostDetailsActivity", "done2: "+post.getPostMoney());*/
+                                double v = currentUser.getMoney() + post.getPostMoney();
+                               // Log.d("PostDetailsActivity", "done3: "+v);
+                                currentUser.setMoney(v);
+                               /* Log.d("PostDetailsActivity", "done4: "+Constant.user.getMoney());
+                                Log.d("PostDetailsActivity", "done5: "+post.getPostMoney());*/
+                                currentUser.update(new UpdateListener() {
                                     @Override
                                     public void done(BmobException e) {
                                         if(e==null){

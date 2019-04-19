@@ -19,6 +19,7 @@ import com.example.immedsee.adapter.PostListAdapter;
 import com.example.immedsee.dao.Post;
 import com.example.immedsee.dao.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,7 +89,13 @@ public class PostAuthorActivity extends AppCompatActivity {
                 UiTools.closeSimpleLD();
                 if(e==null){
                     Collections.reverse(list);
-                    postListAdapter=new PostListAdapter(list);
+                    final List<Post>list2=new ArrayList<>();
+                    for(Post post:list){
+                        if(post.getDeleteTag()==0){
+                            list2.add(post);
+                        }
+                    }
+                    postListAdapter=new PostListAdapter(list2);
                     recyclerViewPost.setAdapter(postListAdapter);
                     postListAdapter.notifyDataSetChanged();
                     postListAdapter.setOnItemClickListener(new PostListAdapter.OnItemClickListener() {
@@ -96,7 +103,7 @@ public class PostAuthorActivity extends AppCompatActivity {
                         public void onItemClick(View view, int position) {
                             if(Constant.user!=null) {
                                 Intent toPostDetailsIntent = new Intent(PostAuthorActivity.this, PostDetailsActivity.class);
-                                toPostDetailsIntent.putExtra("post_data",list.get(position));
+                                toPostDetailsIntent.putExtra("post_data",list2.get(position));
                                 startActivity(toPostDetailsIntent);
                             }else {
                                 DialogPrompt dialogPrompt=new DialogPrompt(PostAuthorActivity.this,R.string.please_login);
