@@ -55,6 +55,7 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout reUserEmail;
     private TextView userEmail;
     private TextView userRegisterDate;
+    private boolean isFirstEmailTest=false; //判断是否是绑定邮箱
     private BmobFile bfile;
     private final int REQUEST_CODE_SELECT_FILE = 105;
 
@@ -126,6 +127,8 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(Constant.user.getEmail()!=null){
             userEmail.setText(Constant.user.getEmail());
+        }else {
+            userEmail.setText("未绑定");
         }
     }
 
@@ -196,7 +199,9 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         user.setByName(usernickname);
         user.setSex(usersex);
         user.setSignature(usersignature);
-        user.setEmail(useremail);
+       if(!useremail.equals("未绑定")&&isFirstEmailTest==true) {
+            user.setEmail(useremail);
+        }
         user.setMoney(Constant.user.getMoney());
         if(bfile!=null){
             user.setAvatar(bfile);
@@ -210,7 +215,7 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                     if (bfile != null) {
                         AppUtils.setAvatarFilePath("");
                     }
-                    if(!useremail.isEmpty()){
+                    if(!useremail.equals("未绑定")&&isFirstEmailTest==true){
                         Toast.makeText(MineActivity.this,"请注意！已经向："+useremail+"发送了验证邮件，请注意查收",Toast.LENGTH_SHORT).show();
                     }
                     Toast.makeText(MineActivity.this,  R.string.update_complete, Toast.LENGTH_SHORT).show();
@@ -268,10 +273,15 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         adb.setPositiveButton(R.string.comfirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if(JudgeUtils.isEmail(et.getText().toString())){
-                    userEmail.setText(et.getText().toString());
+                if (et.getText().toString() != null) {
+                    if (JudgeUtils.isEmail(et.getText().toString())) {
+                        isFirstEmailTest=true;
+                        userEmail.setText(et.getText().toString());
+                    } else {
+                        Toast.makeText(MineActivity.this, "您输入的邮箱格式有问题，请重新输入", Toast.LENGTH_SHORT).show();
+                    }
                 }else {
-                    Toast.makeText(MineActivity.this,"您输入的邮箱格式有问题，请重新输入",Toast.LENGTH_SHORT).show();
+                    userEmail.setText("未绑定");
                 }
             }
         });
