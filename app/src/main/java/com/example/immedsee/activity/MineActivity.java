@@ -191,7 +191,7 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         String usernickname = userNickName.getText().toString();
         String usersex =userSex.getText().toString();
         String usersignature = userSignature.getText().toString();
-        String useremail=userEmail.getText().toString();
+        final String useremail=userEmail.getText().toString();
         User user = new User();
         user.setByName(usernickname);
         user.setSex(usersex);
@@ -210,10 +210,16 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                     if (bfile != null) {
                         AppUtils.setAvatarFilePath("");
                     }
+                    if(!useremail.isEmpty()){
+                        Toast.makeText(MineActivity.this,"请注意！已经向："+useremail+"发送了验证邮件，请注意查收",Toast.LENGTH_SHORT).show();
+                    }
                     Toast.makeText(MineActivity.this,  R.string.update_complete, Toast.LENGTH_SHORT).show();
                     MineActivity.this.setResult(RESULT_OK);
                     MineActivity.this.finish();
-                } else {
+                } else if(e.getErrorCode()==203){
+                    Toast.makeText(MineActivity.this,"邮箱已经被绑定，邮箱绑定失败",Toast.LENGTH_SHORT).show();
+                }
+                else {
                     Toast.makeText(MineActivity.this, R.string.update_error, Toast.LENGTH_SHORT).show();
                 }
             }
