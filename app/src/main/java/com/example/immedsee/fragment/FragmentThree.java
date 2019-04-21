@@ -2,6 +2,7 @@ package com.example.immedsee.fragment;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,7 +26,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.immedsee.R;
 import com.example.immedsee.Utils.AppUtils;
 import com.example.immedsee.Utils.Constant;
+import com.example.immedsee.Utils.DialogPrompt;
 import com.example.immedsee.Utils.DialogPromptPermission;
+import com.example.immedsee.Utils.JudgeUtils;
 import com.example.immedsee.Utils.PermissionUtils;
 import com.example.immedsee.activity.MineActivity;
 import com.example.immedsee.activity.PostAuthorActivity;
@@ -39,6 +43,7 @@ import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.DownloadFileListener;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -55,6 +60,7 @@ public class FragmentThree extends Fragment {
     private RelativeLayout myPost;
     private RelativeLayout  myMoney;
     private RelativeLayout myPasswordReset;
+    private RelativeLayout myPasswordForget;
     private LoginDailogFragment fragment;
     private PasswordResetDialogFragment passwordResetDialogFragment;
     private CircleImageView loginImage;
@@ -79,6 +85,7 @@ public class FragmentThree extends Fragment {
         myPost=(RelativeLayout)view.findViewById(R.id.user_post);
         myMoney=(RelativeLayout)view.findViewById(R.id.user_money);
         myPasswordReset=(RelativeLayout)view.findViewById(R.id.myPassword_reset);
+        myPasswordForget=(RelativeLayout)view.findViewById(R.id.myPassword_forget);
         userName=(TextView)view.findViewById(R.id.username);
         userSignature=(TextView)view.findViewById(R.id.signature);
         loginText=(TextView)view.findViewById(R.id.login_text);
@@ -118,26 +125,34 @@ public class FragmentThree extends Fragment {
         myPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent toAuthorInfoIntent=new Intent(getContext(),PostAuthorActivity.class);
-                toAuthorInfoIntent.putExtra("user",Constant.user);
-                startActivity(toAuthorInfoIntent);
+                if(Constant.user!=null) {
+                    Intent toAuthorInfoIntent = new Intent(getContext(), PostAuthorActivity.class);
+                    toAuthorInfoIntent.putExtra("user", Constant.user);
+                    startActivity(toAuthorInfoIntent);
+                }else {
+                    Toast.makeText(getContext(),"您还没有登陆，请先登陆后再操作",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 //查询剩余的财富
         myMoney.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BmobQuery<User> query=new BmobQuery<>();
-                query.getObject(Constant.user.getObjectId(), new QueryListener<User>() {
-                    @Override
-                    public void done(User user, BmobException e) {
-                        Log.d("FragmentThree", "done: "+user.getMoney());
-                        AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
-                        builder.setTitle("财富");
-                        builder.setMessage("您的即视币剩余为："+user.getMoney());
-                        builder.show();
-                    }
-                });
+                if(Constant.user!=null) {
+                    BmobQuery<User> query = new BmobQuery<>();
+                    query.getObject(Constant.user.getObjectId(), new QueryListener<User>() {
+                        @Override
+                        public void done(User user, BmobException e) {
+                            Log.d("FragmentThree", "done: " + user.getMoney());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("财富");
+                            builder.setMessage("您的即视币剩余为：" + user.getMoney());
+                            builder.show();
+                        }
+                    });
+                }else {
+                    Toast.makeText(getContext(),"您还没有登陆，请先登陆后再操作",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 //修改登陆密码
@@ -153,7 +168,47 @@ public class FragmentThree extends Fragment {
                 }
             }
         });
-
+  //忘记密码功能
+        myPasswordForget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(getContext());
+                adb.setTitle("请输入您绑定的邮箱");
+                final EditText et = new EditText(getContext());
+                adb.setView(et);
+                adb.setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                arg0.cancel();
+                            }
+                        });
+                adb.setPositiveButton(R.string.comfirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(JudgeUtils.isEmail(et.getText().toString())){
+                            BmobUser.resetPasswordByEmail(et.getText().toString(), new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                     if(e==null){
+                                         DialogPrompt dialogPrompt=new DialogPrompt(getActivity(),"重置密码请求成功，请到" + et.getText().toString() + "邮箱进行密码重置操作");
+                                         dialogPrompt.show();
+                                         //Toast.makeText(getContext(),"重置密码请求成功，请到" + et.getText().toString() + "邮箱进行密码重置操作",Toast.LENGTH_SHORT).show();
+                                     }else if(e.getErrorCode()==205) {
+                                         DialogPrompt dialogPrompt=new DialogPrompt(getActivity(),"没有找到绑定此邮箱的用户");
+                                         dialogPrompt.show();
+                                        // Log.d("Bombemail", "done: "+e.toString());
+                                     }
+                                }
+                            });
+                        }else {
+                            Toast.makeText(getContext(),"您输入的邮箱格式有问题，请重新输入",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                adb.show();
+            }
+        });
 
 
         return view;

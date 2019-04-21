@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.immedsee.R;
 import com.example.immedsee.Utils.AppUtils;
 import com.example.immedsee.Utils.Constant;
+import com.example.immedsee.Utils.JudgeUtils;
 import com.example.immedsee.Utils.UiTools;
 import com.example.immedsee.Utils.UniqueCodeUtils;
 import com.example.immedsee.Utils.UriToPathUtil;
@@ -51,6 +52,8 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
     private TextView userSex;
     private RelativeLayout reUserSignature;
     private TextView userSignature;
+    private RelativeLayout reUserEmail;
+    private TextView userEmail;
     private TextView userRegisterDate;
     private BmobFile bfile;
     private final int REQUEST_CODE_SELECT_FILE = 105;
@@ -73,12 +76,15 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         userSex = (TextView) findViewById(R.id.mine_userSex);
         reUserSignature = (RelativeLayout) findViewById(R.id.userSignature);
         userSignature = (TextView) findViewById(R.id.mine_userSignature);
+        reUserEmail=(RelativeLayout)findViewById(R.id.userEmail);
+        userEmail=(TextView)findViewById(R.id.mine_userEmail);
         userRegisterDate = (TextView) findViewById(R.id.mine_userRegisterDate);
 
         reUserImage.setOnClickListener(this);
         reUserNickName.setOnClickListener(this);
         reUserSex.setOnClickListener(this);
         reUserSignature.setOnClickListener(this);
+        reUserEmail.setOnClickListener(this);
 
         initData();
     }
@@ -117,6 +123,9 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (Constant.user.getSex() != null) {
             userSex.setText(Constant.user.getSex());
+        }
+        if(Constant.user.getEmail()!=null){
+            userEmail.setText(Constant.user.getEmail());
         }
     }
 
@@ -182,10 +191,13 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
         String usernickname = userNickName.getText().toString();
         String usersex =userSex.getText().toString();
         String usersignature = userSignature.getText().toString();
+        String useremail=userEmail.getText().toString();
         User user = new User();
         user.setByName(usernickname);
         user.setSex(usersex);
         user.setSignature(usersignature);
+        user.setEmail(useremail);
+        user.setMoney(Constant.user.getMoney());
         if(bfile!=null){
             user.setAvatar(bfile);
         }
@@ -224,7 +236,40 @@ public class MineActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.userSex:
                 changeSex();
+                break;
+            case R.id.userEmail:
+                emailTest();
+                break;
         }
+
+    }
+
+    private void emailTest() {
+        AlertDialog.Builder adb = new AlertDialog.Builder(MineActivity.this);
+        adb.setTitle("请绑定您的邮箱");
+        final EditText et = new EditText(MineActivity.this);
+        if (Constant.user.getEmail() != null) {
+            et.setText(Constant.user.getEmail());
+        }
+        adb.setView(et);
+        adb.setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        arg0.cancel();
+                    }
+                });
+        adb.setPositiveButton(R.string.comfirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(JudgeUtils.isEmail(et.getText().toString())){
+                    userEmail.setText(et.getText().toString());
+                }else {
+                    Toast.makeText(MineActivity.this,"您输入的邮箱格式有问题，请重新输入",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        adb.show();
 
     }
 

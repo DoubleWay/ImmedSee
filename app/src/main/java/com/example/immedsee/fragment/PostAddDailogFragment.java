@@ -81,7 +81,7 @@ public class PostAddDailogFragment extends DialogFragment implements View.OnClic
                     dialogPrompt.show();
                     return;
                 }
-                double money=Double.parseDouble(moneyString);
+                double money=Double.parseDouble(moneyString);//将输入的String转化为double
                 Log.d("poasadd", "onClick: "+money);
                 User user= BmobUser.getCurrentUser(User.class);
                 Log.d("poasadd", "onClick: "+user.getUsername());
