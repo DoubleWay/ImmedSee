@@ -10,7 +10,14 @@ import android.widget.Toast;
 import org.litepal.LitePal;
 import org.litepal.LitePalApplication;
 
+import java.util.logging.Logger;
+
+import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobInstallation;
+import cn.bmob.v3.BmobInstallationManager;
+import cn.bmob.v3.InstallationListener;
+import cn.bmob.v3.exception.BmobException;
 
 /**
  * 获得全景需要集成的applicatio
@@ -24,6 +31,21 @@ public class PanorApplication extends Application {
         super.onCreate();
         LitePal.initialize(this);
         Bmob.initialize(this, "054691472ad9df302769cef111cd2442");
+        BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
+            @Override
+            public void done(BmobInstallation bmobInstallation, BmobException e) {
+                if (e == null) {
+                    //Logger.i(bmobInstallation.getObjectId() + "-" + bmobInstallation.getInstallationId());
+                    Log.d("application", "done: "+bmobInstallation.getObjectId() + "-" + bmobInstallation.getInstallationId());
+                } else {
+                   // Logger.e(e.getMessage());
+                    Log.d("application", "done: "+e.getMessage());
+
+                }
+            }
+        });
+// 启动推送服务
+        BmobPush.startWork(this);
         mInstance = this;
         initEngineManager(this);
     }
