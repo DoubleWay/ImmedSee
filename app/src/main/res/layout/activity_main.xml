@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#00bdaa"
+        android:background="@color/mine_app_theme"
         app:menu="@menu/navigation" />
 
 </LinearLayout>

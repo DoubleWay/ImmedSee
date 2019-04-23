@@ -147,6 +147,7 @@ public class RouteSearchActivity extends AppCompatActivity {
             toRoutePlanIntent.putExtra("ResultAddress",resultAddress);
             toRoutePlanIntent.putExtra("ResultLatitude",resultLatitude);
             toRoutePlanIntent.putExtra("ResultLongitude",resultLongitude);
+            toRoutePlanIntent.putExtra("ResultCity",locationCity);
             startActivity(toRoutePlanIntent);
         }else {
             Toast.makeText(RouteSearchActivity.this,"请输入起点或终点",Toast.LENGTH_SHORT).show();

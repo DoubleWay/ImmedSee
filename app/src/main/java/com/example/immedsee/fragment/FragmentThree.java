@@ -4,9 +4,13 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -30,6 +33,7 @@ import com.example.immedsee.Utils.DialogPrompt;
 import com.example.immedsee.Utils.DialogPromptPermission;
 import com.example.immedsee.Utils.JudgeUtils;
 import com.example.immedsee.Utils.PermissionUtils;
+import com.example.immedsee.Utils.UriToPathUtil;
 import com.example.immedsee.activity.MineActivity;
 import com.example.immedsee.activity.PostAuthorActivity;
 import com.example.immedsee.dao.User;
@@ -46,6 +50,8 @@ import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.UpdateListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * DoubleWay on 2019/2/15:16:31
  * 邮箱：13558965844@163.com
@@ -56,6 +62,7 @@ public class FragmentThree extends Fragment {
     public static final int REQUEST_CODE_PASSWORD_RESET = 2;
     private final int REQUEST_CODE_UPDATE = 104;
     private final int REQUEST_CODE_PERMISSIONS = 1005;
+    public final int IMAGE_CHOOSE=3;
     private RelativeLayout logout;
     private RelativeLayout myPost;
     private RelativeLayout  myMoney;
@@ -67,6 +74,8 @@ public class FragmentThree extends Fragment {
     private TextView userName;
     private TextView userSignature;
     private TextView loginText;
+    private ImageView bingImage;
+    private RelativeLayout changeBackground;
     private String[] permission_login = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE
     };
@@ -89,21 +98,47 @@ public class FragmentThree extends Fragment {
         userName=(TextView)view.findViewById(R.id.username);
         userSignature=(TextView)view.findViewById(R.id.signature);
         loginText=(TextView)view.findViewById(R.id.login_text);
+        bingImage=(ImageView)view.findViewById(R.id.bing_image);
         loginImage=(CircleImageView)view.findViewById(R.id.icon_image);
+        changeBackground=(RelativeLayout)view.findViewById(R.id.background_change);
         if (PermissionUtils.checkSelfPermission(getActivity(), permission_login, REQUEST_CODE_PERMISSIONS)) {
             initData();
         }
+        //切换背景图片
+       changeBackground.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               Intent choosePicIntent = new Intent();
+              // choosePicIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+               choosePicIntent.setType("image/*");
+               choosePicIntent.setAction(Intent.ACTION_PICK);
+               startActivityForResult(choosePicIntent,IMAGE_CHOOSE);
+              // Glide.with(getContext()).load(R.drawable.backgroundtest).into(bingImage);
+           }
+       });
         //退出登陆
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BmobUser.logOut();   //清除缓存用户对象
-                AppUtils.setAvatarFilePath("");
-                Constant.user = null;
-                userSignature.setText("");
-                userName.setText("");
-                loginText.setVisibility(View.VISIBLE);
-                setDefaultAvatar();
+                if(BmobUser.getCurrentUser(User.class)!=null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("您确定退出登陆？");
+                    builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            BmobUser.logOut();   //清除缓存用户对象
+                            AppUtils.setAvatarFilePath("");
+                            Constant.user = null;
+                            userSignature.setText("");
+                            userName.setText("");
+                            loginText.setVisibility(View.VISIBLE);
+                            setDefaultAvatar();
+                        }
+                    });
+                    builder.show();
+                }else {
+                    Toast.makeText(getContext(),"您还没有登陆，请先登陆后再操作",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -215,6 +250,12 @@ public class FragmentThree extends Fragment {
     }
 
     private void initData() {
+        //从本地缓存中读取图片，如果有则设置为背景
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String bingPic = prefs.getString("bing_pic", null);
+        if(bingPic!=null){
+            Glide.with(getContext()).load(bingPic).into(bingImage);
+        }
         File fileBase = new File(Constant.imagePath);
         if (!fileBase.exists()) {
             fileBase.mkdirs();
@@ -292,6 +333,8 @@ public class FragmentThree extends Fragment {
                 .apply(options)
                 .into(loginImage);
     }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -309,6 +352,19 @@ public class FragmentThree extends Fragment {
         if(requestCode==REQUEST_CODE_PASSWORD_RESET){
             passwordResetDialogFragment.dismiss();
             Log.d("passwordReset", "onActivityResult:hhhh ");
+        }
+        if(resultCode==RESULT_OK&&requestCode==IMAGE_CHOOSE){
+            Uri originalUri = data.getData();
+            if(originalUri!=null) {
+                /**
+                 * 从相册选出图片存到本地缓存中
+                 */
+                String bingPic = UriToPathUtil.getRealFilePath(getContext(), originalUri);
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+                editor.putString("bing_pic", bingPic);
+                editor.apply();
+                Glide.with(getContext()).load(bingPic).into(bingImage);
+            }
         }
 
     }

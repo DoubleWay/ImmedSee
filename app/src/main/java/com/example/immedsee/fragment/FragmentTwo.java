@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.immedsee.R;
@@ -49,7 +50,8 @@ public class FragmentTwo extends Fragment {
      private PostListAdapter postListAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
      private PostAddDailogFragment postAddDailogFragment;
-
+    private List<Post>list2=new ArrayList<>();
+    private  int mPosition;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -109,7 +111,7 @@ public class FragmentTwo extends Fragment {
     public void onStart() {
 
         super.onStart();
-        setPostInfo();
+       // setPostInfo();
     }
 
     /**
@@ -127,7 +129,11 @@ public class FragmentTwo extends Fragment {
                 if(e==null){
                     Collections.reverse(list);//重要，将list的排列顺序倒置
                     //因为再外部进行条件查询好像有问题，查询总是失败，所以在查询后用一个list进行筛选
-                    final List<Post>list2=new ArrayList<>();
+                    //因为局部刷新，如果因为list2初始化在外面，所以每次进来的时候如果里面有值的话就清空
+                    //避免一直list2 add下去
+                     if(!list2.isEmpty()){
+                         list2.clear();
+                     }
                     for(Post post:list){
                         if(post.getDeleteTag()==0){
                             list2.add(post);
@@ -136,16 +142,19 @@ public class FragmentTwo extends Fragment {
                    /* Log.d("fragmenttwo", "done: "+list.get(0).getAuthor().getObjectId());
                     Log.d("fragmenttwo", "done: "+list.get(0).getAuthor().getSignature());*/
                     postListAdapter=new PostListAdapter(list2);
+                    //postListAdapter.setHasStableIds(true);
                     recyclerViewPost.setAdapter(postListAdapter);
+                   // recyclerViewPost.setItemAnimator(null);
                     postListAdapter.notifyDataSetChanged();
 
                         postListAdapter.setOnItemClickListener(new PostListAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
                                 if(Constant.user!=null) {
+                                    mPosition=position;
                                     Intent toPostDetailsIntent = new Intent(getContext(), PostDetailsActivity.class);
                                     toPostDetailsIntent.putExtra("post_data",list2.get(position));
-                                    startActivity(toPostDetailsIntent);
+                                    startActivityForResult(toPostDetailsIntent,1000);
                                 }else {
                                     DialogPrompt dialogPrompt=new DialogPrompt(getActivity(),R.string.please_login);
                                     dialogPrompt.show();
@@ -168,6 +177,29 @@ public class FragmentTwo extends Fragment {
             UiTools.closeSimpleLD();
             setPostInfo();
             postAddDailogFragment.dismiss();
+        }
+        if(requestCode==1000){
+            /**
+             * 根据在post详情页面的操作进行判断
+             * 如果是删除帖子，回来后重新加载post页面
+             * 如果是结贴，则只进行局部刷新
+             */
+            String id=list2.get(mPosition).getObjectId();
+            BmobQuery<Post> query=new BmobQuery<>();
+            query.addWhereEqualTo("objectId",id);
+            query.findObjects(new FindListener<Post>() {
+                @Override
+                public void done(List<Post> list, BmobException e) {
+                    list2.get(mPosition).setEnd(list.get(0).isEnd());
+                    list2.get(mPosition).setDeleteTag(list.get(0).getDeleteTag());
+                    if(list.get(0).getDeleteTag()==1){
+                        setPostInfo();
+                    }
+                    if(list.get(0).isEnd()) {
+                        postListAdapter.notifyItemChanged(mPosition);
+                    }
+                }
+            });
         }
     }
 

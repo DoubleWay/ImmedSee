@@ -10,7 +10,7 @@
         android:id="@+id/route_search_toolBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#00bdaa"
+        android:background="@color/mine_app_theme"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         >

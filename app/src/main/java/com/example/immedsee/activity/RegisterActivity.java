@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.immedsee.R;
 import com.example.immedsee.Utils.Code;
 import com.example.immedsee.Utils.DialogPrompt;
+import com.example.immedsee.Utils.JudgeUtils;
 import com.example.immedsee.Utils.UiTools;
 import com.example.immedsee.dao.User;
 
@@ -49,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
         resCodesImg=(ImageView)findViewById(R.id.register_codes_image);
         //将验证码以图片的形式展现出来
         resCodesImg.setImageBitmap(Code.getInstance().createBitmap());
-        //获得验证码里的数字
+        //获得验证码里的字符转化为小写
         realCode=Code.getInstance().getCode().toLowerCase();
         resCodesImg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +102,14 @@ public class RegisterActivity extends AppCompatActivity {
         }
         if(!code.equals(realCode)){
             DialogPrompt dialogPrompt=new DialogPrompt(RegisterActivity.this,R.string.codes_error);
+            dialogPrompt.show();
+            resCodesImg.setImageBitmap(Code.getInstance().createBitmap());
+            //再次重新生成随机码
+            realCode=Code.getInstance().getCode().toLowerCase();
+            return;
+        }
+        if(!JudgeUtils.isUserName(name)){
+            DialogPrompt dialogPrompt=new DialogPrompt(RegisterActivity.this,R.string.error_register_invalid_name);
             dialogPrompt.show();
             resCodesImg.setImageBitmap(Code.getInstance().createBitmap());
             //再次重新生成随机码

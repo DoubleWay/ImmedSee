@@ -116,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+//预防fragment的重叠问题
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("android:support:fragments", null);
+    }
 }
 
 

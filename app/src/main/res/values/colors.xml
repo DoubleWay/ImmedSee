@@ -16,4 +16,5 @@
     <color name="black80">#80000000</color>
     <color name="dark_blue">#2196F3</color>
     <color name="red">#df0054</color>
+    <color name="mine_app_theme">#7DCEA0</color>
 </resources>

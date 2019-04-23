@@ -88,6 +88,11 @@ public class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.ViewHo
         return mPostList.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }

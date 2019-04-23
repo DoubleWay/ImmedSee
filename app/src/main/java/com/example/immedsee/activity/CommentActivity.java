@@ -1,7 +1,10 @@
 package com.example.immedsee.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaDataSource;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -14,11 +17,14 @@ import com.example.immedsee.R;
 import com.example.immedsee.Utils.Constant;
 import com.example.immedsee.Utils.DialogPrompt;
 import com.example.immedsee.Utils.UiTools;
+import com.example.immedsee.Utils.UniqueCodeUtils;
 import com.example.immedsee.Utils.UriToPathUtil;
 import com.example.immedsee.View.MultiImageView;
 import com.example.immedsee.dao.Comment;
 import com.example.immedsee.dao.Post;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,8 +134,29 @@ public class CommentActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK&&requestCode==IMAGE_SELECT){
             Uri originalUri = data.getData();
-            list_path.add(UriToPathUtil.getRealFilePath(this,originalUri));
+            /**
+             * 通过Ucrop裁剪控件来对图片进行压缩，但是会丢失图片的清晰度
+             */
+            //创建裁剪输出uri
+            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "SampleCropImage"+ UniqueCodeUtils.genSimplePWD()+".jpeg"));
+            UCrop.of(originalUri,destinationUri)
+                    .withAspectRatio(1, 1)
+                    .withMaxResultSize(512, 512)
+                    .start(this);
+           /* list_path.add(UriToPathUtil.getRealFilePath(this,originalUri));
+            multiImageView.setList(list_path);*/
+        }
+        if (requestCode == UCrop.REQUEST_CROP) {
+            Log.d("this", "处理完成");
+            final Uri resultUri = UCrop.getOutput(data);
+            //这里的resultUri.getPath()获取到的是图片的绝对路径
+            Log.d("this", "resultUri.getPath()=" + resultUri.getPath());
+            list_path.add(resultUri.getPath());
             multiImageView.setList(list_path);
+
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            Throwable cropError = UCrop.getError(data);
+            Log.e("this", "剪裁错误：" + cropError.getMessage());
         }
     }
 }

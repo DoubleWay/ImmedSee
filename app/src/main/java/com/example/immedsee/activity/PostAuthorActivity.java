@@ -79,6 +79,12 @@ public class PostAuthorActivity extends AppCompatActivity {
         initPostData();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initPostData();
+    }
+
     private void initPostData() {
         BmobQuery<Post> query=new BmobQuery<>();
         query.addWhereEqualTo("author",user);
