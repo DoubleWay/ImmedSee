@@ -69,6 +69,7 @@
                 android:layout_below="@+id/icon_image"
                 android:layout_centerHorizontal="true"
                 android:text="点击头像登陆"
+                android:textColor="@color/white"
                 android:textStyle="bold|italic" />
 
             <TextView

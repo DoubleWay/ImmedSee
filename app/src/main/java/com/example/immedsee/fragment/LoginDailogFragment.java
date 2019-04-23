@@ -6,9 +6,11 @@ package com.example.immedsee.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,10 +41,13 @@ import cn.bmob.v3.listener.SaveListener;
  */
 public class LoginDailogFragment extends DialogFragment implements View.OnClickListener {
 
-    public static final String USERNAME = "userName";
-    public static final String USERPASSWORD = "userPassword";
+   // public static final String USERNAME = "userName";
+    //public static final String USERPASSWORD = "userPassword";
+    private SharedPreferences.Editor editor;
+    private SharedPreferences pref;
     private EditText mUsername;
     private EditText mPassword;
+    private CheckBox rememberPassword;
     private Button btn;
    // private ImageView iv;
     private TextView toReg;
@@ -64,10 +70,24 @@ public class LoginDailogFragment extends DialogFragment implements View.OnClickL
         mUsername= view.findViewById(R.id.login_et1);
         btn= view.findViewById(R.id.login_btn);
         mPassword= view.findViewById(R.id.login_et2);
+        rememberPassword=view.findViewById(R.id.remember_password);
+        /**
+         * 用本地缓存实现记住账号密码功能
+         */
+        pref= PreferenceManager.getDefaultSharedPreferences(getContext());
+        boolean isRemember=pref.getBoolean("remember_password",false);
+        if(isRemember){
+            String userName=pref.getString("userName","");
+            String passWord=pref.getString("passWord","");
+            mUsername.setText(userName);
+            mUsername.setSelection(userName.length());
+            mPassword.setText(passWord);
+            mPassword.setSelection(passWord.length());
+            rememberPassword.setChecked(true);
+        }
        // iv.setOnClickListener(this);
         toReg.setOnClickListener(this);
         btn.setOnClickListener(this);
-
         builder.setView(view);
         return builder.create();
     }
@@ -92,6 +112,15 @@ public class LoginDailogFragment extends DialogFragment implements View.OnClickL
                      dialogPrompt.show();
                      return;
                  }
+                 editor=pref.edit();
+                 if(rememberPassword.isChecked()){
+                     editor.putString("userName",userName);
+                     editor.putString("passWord",password);
+                     editor.putBoolean("remember_password",true);
+                 }else {
+                     editor.clear();
+                 }
+                 editor.apply();
                  UiTools.showSimpleLD(getActivity(), R.string.loading_login);
                  BmobUser bombUser = new BmobUser();
                  bombUser.setUsername(userName);
@@ -103,8 +132,8 @@ public class LoginDailogFragment extends DialogFragment implements View.OnClickL
                           if(e==null){
                               Toast.makeText(getActivity().getApplicationContext(), R.string.login_successful, Toast.LENGTH_LONG).show();
                               Intent intent= new Intent();
-                              intent.putExtra(USERNAME, mUsername.getText().toString());
-                              intent.putExtra(USERPASSWORD, mPassword.getText().toString());
+                             /* intent.putExtra(USERNAME, mUsername.getText().toString());
+                              intent.putExtra(USERPASSWORD, mPassword.getText().toString());*/
                               getTargetFragment().onActivityResult(FragmentThree.REQUEST_CODE, Activity.RESULT_OK, intent);
                           }else {
                               if (e.getErrorCode() == 101){
