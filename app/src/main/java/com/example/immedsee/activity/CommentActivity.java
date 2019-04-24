@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaDataSource;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -25,6 +29,7 @@ import com.example.immedsee.dao.Post;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,13 +43,16 @@ public class CommentActivity extends AppCompatActivity {
     private EditText commentContentEdit;
     private MultiImageView multiImageView;
     private List<String> list_path = new ArrayList<>();
+    private Uri imageUri;
     public static final int IMAGE_SELECT = 1;
+    private static final int MAKE_PHOTO=2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
         Toolbar toolbar = (Toolbar)findViewById(R.id.comment_toolBar);
         toolbar.setTitle("评论");
+        setSupportActionBar(toolbar);
         post=(Post)getIntent().getSerializableExtra("post_data");
        /* if(post!=null){
             Log.d("CommentActivity", post.getPostContent());
@@ -117,7 +125,47 @@ public class CommentActivity extends AppCompatActivity {
 
    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.comment_make_photo, menu);
+        return true;
+    }
 
+    /**
+     *通过照相机照相获取图片，放在九宫格上
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+       switch (item.getItemId()) {
+           case R.id.make_photo:
+               Log.d("CommentActivity", getExternalCacheDir().getAbsolutePath().toString());
+               //Toast.makeText(this,"make photo",Toast.LENGTH_SHORT).show();
+               //创建一个文件用于存放拍照的图片，放在sd卡的应用关联缓存目录下
+               File outoutImage = new File(getExternalCacheDir(), "output_image.jpg");
+               try {
+                   if (outoutImage.exists()) {
+                       outoutImage.delete();
+                   }
+                   outoutImage.createNewFile();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+              //进行判断如果是android7.0或者以上，就用fileprovider的getUriForFile方法将file转换成一个封装过的
+               //uri对象，如果不是就用Uri的fromFile方法
+               if(Build.VERSION.SDK_INT>=24){
+                   imageUri= FileProvider.getUriForFile(CommentActivity.this,"com.example.immedsee.fileprovider",outoutImage);
+
+               }else {
+               imageUri = Uri.fromFile(outoutImage);
+       }
+               //启动相机程序
+               Intent intent=new Intent("android.media.action.IMAGE_CAPTURE");
+               //指定照相图片的存放路径
+               intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+               startActivityForResult(intent,MAKE_PHOTO);
+       }
+        return true;
+    }
 
     /**
      * 从图库中选取图片,显示在九宫格上
@@ -146,6 +194,16 @@ public class CommentActivity extends AppCompatActivity {
            /* list_path.add(UriToPathUtil.getRealFilePath(this,originalUri));
             multiImageView.setList(list_path);*/
         }
+
+        if(resultCode==RESULT_OK&&requestCode==MAKE_PHOTO){
+            //创建裁剪输出uri
+            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "SampleCropImage"+ UniqueCodeUtils.genSimplePWD()+".jpeg"));
+            UCrop.of(imageUri,destinationUri)
+                    .withAspectRatio(1, 1)
+                    .withMaxResultSize(512, 512)
+                    .start(this);
+        }
+
         if (requestCode == UCrop.REQUEST_CROP) {
             Log.d("this", "处理完成");
             final Uri resultUri = UCrop.getOutput(data);
@@ -158,5 +216,8 @@ public class CommentActivity extends AppCompatActivity {
             Throwable cropError = UCrop.getError(data);
             Log.e("this", "剪裁错误：" + cropError.getMessage());
         }
+
+
     }
+
 }

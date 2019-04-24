@@ -14,6 +14,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--为了兼容老版本，照相时访问应用关联目录访问sd卡申请权限-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- 获取wifi网络状态的信息 -->
@@ -38,9 +40,9 @@
     <application
         android:name=".activity.PanorApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_immedsee"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_immedsee"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data
@@ -50,11 +52,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="即视">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service
@@ -65,7 +63,13 @@
         <!-- activity作为欢迎页 -->
         <activity
             android:name=".activity.WelcomeActivity"
-            android:theme="@style/AppWelcome" />
+            android:theme="@style/AppWelcome" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.SearchActivity" />
         <activity android:name=".activity.SearchResultActivity" />
         <activity android:name=".activity.ResultDetailsActivity" />
@@ -84,6 +88,21 @@
         <activity android:name=".activity.PostDetailsActivity" />
         <activity android:name=".activity.PostAuthorActivity" />
         <activity android:name=".activity.CommentActivity"></activity>
+
+       <!-- android7.0开始，直接使用本地真实路径是认为不安全的，会抛出一个FileUriExposedException的异常
+        Fileprovider是一个特殊的内容提供器，使用了和内容提供器类似的保护机制，可以选择性的将封装后的uri
+        分享给外部，提高了安全性-->
+        <provider
+            android:authorities="com.example.immedsee.fileprovider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+
+        </provider>
 
         <!--TODO 集成：1.2、添加推送所需要的服务和广播-->
         <service
