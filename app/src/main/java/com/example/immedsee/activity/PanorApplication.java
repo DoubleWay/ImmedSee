@@ -78,7 +78,8 @@ public class PanorApplication extends Application {
                 Toast.makeText(
                         PanorApplication.getInstance()
                                 .getApplicationContext(),
-                        "请在AndoridManifest.xml中输入正确的授权Key,并检查您的网络连接是否正常！error: "
+                        /*"请在AndoridManifest.xml中输入正确的授权Key,并检查您的网络连接是否正常！error: "*/
+                        "请确定您打开了网络或者定位"
                                 + iError, Toast.LENGTH_LONG).show();
             } /*else {
                 Toast.makeText(

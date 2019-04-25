@@ -116,6 +116,14 @@ public class RegisterActivity extends AppCompatActivity {
             realCode=Code.getInstance().getCode().toLowerCase();
             return;
         }
+        if(!JudgeUtils.isPassword(pwd)){
+            DialogPrompt dialogPrompt=new DialogPrompt(RegisterActivity.this,R.string.error_register_invalid_password);
+            dialogPrompt.show();
+            resCodesImg.setImageBitmap(Code.getInstance().createBitmap());
+            //再次重新生成随机码
+            realCode=Code.getInstance().getCode().toLowerCase();
+            return;
+        }
         UiTools.showSimpleLD(RegisterActivity.this, R.string.loading);
         User user=new User();
         user.setUsername(name);
