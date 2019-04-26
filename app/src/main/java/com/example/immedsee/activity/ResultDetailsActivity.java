@@ -129,15 +129,23 @@ public class ResultDetailsActivity extends AppCompatActivity {
         if(resultUid!=null) {
             PanoramaRequest request = PanoramaRequest.getInstance(ResultDetailsActivity.this);
             BaiduPoiPanoData poiPanoData = request.getPanoramaInfoByUid(resultUid);
-          if (poiPanoData.hasInnerPano()) {//判断该POI是否有内景
+            /**
+             * 这里直接通过UID来展示全景图，会崩溃闪退，所以直接用经纬度来展示全景图
+             */
+         /* if (poiPanoData.hasInnerPano()) {//判断该POI是否有内景
               mPanoramaView.setPanoramaByUid(resultUid, PanoramaView.PANOTYPE_INTERIOR);
               //mPanoramaView.setIndoorAlbumGone();//除去内景相册
               mPanoramaView.setIndoorAlbumVisible();//将内景相册显示
-          } else if (poiPanoData.hasStreetPano()) {//判断该POI是否有外景,就只能通过经纬度来显示外景
+          } else*/
+         if (poiPanoData.hasStreetPano()) {//判断该POI是否有外景,就只能通过经纬度来显示外景
               mPanoramaView.setPanorama(resultLongitude, resultLatitude);//没有内景就通过经纬度来展示街景
+
           } else {
               Toast.makeText(ResultDetailsActivity.this, "sorry,这里没有全景", Toast.LENGTH_SHORT).show();
           }
+            /**
+             * 有uid可以通过poi的详情搜索展示poi地点的详情
+             */
           mPoiSearch.searchPoiDetail((new PoiDetailSearchOption())
                   .poiUids(resultUid));
       }  else {
