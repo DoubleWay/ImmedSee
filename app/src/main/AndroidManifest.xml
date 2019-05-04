@@ -51,6 +51,7 @@
 
         <activity
             android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:label="即视">
 
         </activity>
@@ -63,6 +64,7 @@
         <!-- activity作为欢迎页 -->
         <activity
             android:name=".activity.WelcomeActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppWelcome" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -70,15 +72,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SearchActivity" />
-        <activity android:name=".activity.SearchResultActivity" />
-        <activity android:name=".activity.ResultDetailsActivity" />
-        <activity android:name=".activity.RoutePlanActivity" />
-        <activity android:name=".activity.WNaviGuideActivity" />
-        <activity android:name=".activity.BNaviGuideActivity" />
-        <activity android:name=".activity.RouteSearchActivity" />
-        <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.MineActivity" />
+        <activity android:name=".activity.SearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.SearchResultActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.ResultDetailsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RoutePlanActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.WNaviGuideActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.BNaviGuideActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RouteSearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.MineActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 配置导入的ucorp图片裁剪activity -->
         <activity
