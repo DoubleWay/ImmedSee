@@ -52,6 +52,11 @@ import com.baidu.mapapi.search.poi.PoiSearch;
 
 import com.example.immedsee.R;
 import com.example.immedsee.adapter.SearchResultAdapter;
+import com.liaoinstan.springview.container.DefaultFooter;
+import com.liaoinstan.springview.container.DefaultHeader;
+import com.liaoinstan.springview.meituanheader.MeituanFooter;
+import com.liaoinstan.springview.meituanheader.MeituanHeader;
+import com.liaoinstan.springview.widget.SpringView;
 
 
 import java.util.ArrayList;
@@ -59,6 +64,7 @@ import java.util.List;
 
 public class SearchResultActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
+    private SpringView springViewSearchResult;
     private MyLocationConfiguration.LocationMode mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
     private int mXDirection;
     private float mCurrentAccracy;
@@ -94,11 +100,6 @@ public class SearchResultActivity extends AppCompatActivity {
         mLocationClient.registerLocationListener(new MyLocationListener());
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_search_result);
-
-        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swip_refresh);//下拉刷新控件
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-
-
         floatSearchResult=(FloatingActionButton)findViewById(R.id.fab_sreach_resuit);
         mapView=(MapView)findViewById(R.id.searchbmapview);
         //移除百度地图LOGO
@@ -140,38 +141,27 @@ public class SearchResultActivity extends AppCompatActivity {
         if(mLatitude==0&&mLongitude==0) {
               requestLocation();
             /**
-             * recycleview的刷新事件判断，如果是poi搜索且有多页结果，下拉刷新为下一页
+             * recycleview的刷新事件判断，如果是poi搜索且有多页结果，上拉加载下一页，下拉加载上一页
              * 如果是suggest搜索直接标注的，刷新事件没反应
              */
-            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            springViewSearchResult=(SpringView)findViewById(R.id.springview_search_result);
+            springViewSearchResult.setHeader(new MeituanHeader(this));
+            springViewSearchResult.setFooter(new MeituanFooter(this));
+            springViewSearchResult.setListener(new SpringView.OnFreshListener() {
                 @Override
                 public void onRefresh() {
-                    int currentPageNum = mPoiResult.getCurrentPageNum();
-                    int totalPageNum = mPoiResult.getTotalPageNum();
-                    //Log.d("number", "onGetPoiResult: " + totalPageNum);
-                    if (currentPageNum < totalPageNum-1) {
-                        isFirstAdapter = true;
-                        mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum + 1)).radius(1000)
-                                .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
-                                .keyword(Query));
-                        swipeRefreshLayout.setRefreshing(false);
-                       /* Toast.makeText(SearchResultActivity.this, "hhhh", Toast.LENGTH_SHORT).show();*/
-                    }else {
-                        swipeRefreshLayout.setRefreshing(false);
-                         Toast.makeText(SearchResultActivity.this, "已经是最后一页", Toast.LENGTH_SHORT).show();
-                    }
+                    int setType=1;
+                    setSearchResultList(setType);
                 }
 
+                @Override
+                public void onLoadmore() {
+                    int setType=0;
+                    setSearchResultList(setType);
+                }
             });
+
           }else {
-
-            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-            });
-
               LL = new LatLng(mLatitude, mLongitude);
             /**
              * 根据模糊搜索传来的UID进行poi详情搜索
@@ -197,9 +187,40 @@ public class SearchResultActivity extends AppCompatActivity {
 
     }
 
+    private void setSearchResultList(int type) {
+        int currentPageNum = mPoiResult.getCurrentPageNum();
+        int totalPageNum = mPoiResult.getTotalPageNum();
+        int num = 0;
+        String text=null;
+        if(type==1&&currentPageNum > 0){
+            num=-1;
 
+            isFirstAdapter = true;
+            mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum+num)).radius(1000)
+                    .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                    .keyword(Query));
+            springViewSearchResult.onFinishFreshAndLoad();
+        }
+        else if(type==0&&currentPageNum < totalPageNum-1){
+            num=1;
 
-
+            isFirstAdapter = true;
+            mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum + num)).radius(1000)
+                    .location(new LatLng(mCurrentLatitude, mCurrentLongitude))
+                    .keyword(Query));
+            springViewSearchResult.onFinishFreshAndLoad();
+        }
+        else {
+            if(type==1){
+                text="已经是第一页";
+            }
+            if(type==0){
+                text="已经是最后一页";
+            }
+            springViewSearchResult.onFinishFreshAndLoad();
+            Toast.makeText(SearchResultActivity.this, text, Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     private void requestLocation() {
@@ -414,48 +435,6 @@ public class SearchResultActivity extends AppCompatActivity {
 
         }
     };
-
- /* class OnScrollListener extends RecyclerView.OnScrollListener {
-      private int lastVisibleItem;
-
-       @Override
-      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-           super.onScrollStateChanged(recyclerView, newState);
-           if ((newState == RecyclerView.SCROLL_STATE_IDLE)
-                   && (lastVisibleItem + 1 == resultAdapter.getItemCount())) {
-               //已经滑动到最后一个 item
-               //在这里执行刷新/加载更多的操作
-              *//* int currentPageNum = mPoiResult.getCurrentPageNum();
-               int totalPageNum = mPoiResult.getTotalPageNum();
-
-               isFirstAdapter=true;
-               mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum+1)).radius(1000)
-                       .location(new LatLng(mcurrentLoction.getLatitude(),mcurrentLoction.getLongitude()))
-                       .keyword(Query));*//*
-               TimerTask timerTask =new TimerTask() {
-                   @Override
-                   public void run() {
-                       int currentPageNum = mPoiResult.getCurrentPageNum();
-                       int totalPageNum = mPoiResult.getTotalPageNum();
-
-                       isFirstAdapter=true;
-                       mPoiSearch.searchNearby((new PoiNearbySearchOption().pageNum(currentPageNum+1)).radius(1000)
-                               .location(new LatLng(mcurrentLoction.getLatitude(),mcurrentLoction.getLongitude()))
-                               .keyword(Query));
-                   }
-               };
-               Timer timer=new Timer();
-               timer.schedule(timerTask,2000);
-               Toast.makeText(SearchResultActivity.this, "LLLLL", Toast.LENGTH_SHORT).show();
-           }
-       }
-      @Override
-      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-          super.onScrolled(recyclerView, dx, dy);
-          lastVisibleItem=layoutManager.findLastVisibleItemPosition();
-      }
-
-  }*/
 
 
     BaiduMap.OnMapClickListener mapClickListener=new BaiduMap.OnMapClickListener() {

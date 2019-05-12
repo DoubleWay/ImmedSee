@@ -188,43 +188,10 @@ public class SearchActivity extends AppCompatActivity  implements View.OnClickLi
                 /**
                  * 将要进行周边搜索的目标地点坐标传给搜索页面
                  */
-                final PopupWindow popupWindow = new PopupWindow();
-                popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-                popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-                popupWindow.setFocusable(true);
-                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.popup,null);
-                popupWindow.setContentView(view);
-                popupWindow.showAtLocation(getWindow().getDecorView(), Gravity.CENTER,0,0);
-                /**
-                 * 通过异步消息处理 得到loading加载效果
-                 */
-                final Handler handler=new Handler(){
-
-                    @Override
-                    public void handleMessage(Message msg) {
-                        super.handleMessage(msg);
-                        if(msg.what==0) {
-                            Intent intent = new Intent(SearchActivity.this, SearchResultActivity.class);
-
-                            intent.putExtra("ResultLocationLongitude", resultLocationLongitude);
-                            intent.putExtra("ResultLocationLatitude", resultLocationLatitude);
-                            intent.putExtra("Query", query);
-                            startActivity(intent);
-                        }
-                    }
-
-                };
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        popupWindow.dismiss();
-                        Message message=new Message();
-                        message.what=0;
-                        handler.sendMessage(message);
-                    }
-                },2000);
-
-
+                intent.putExtra("ResultLocationLongitude", resultLocationLongitude);
+                intent.putExtra("ResultLocationLatitude", resultLocationLatitude);
+                intent.putExtra("Query", query);
+                startActivity(intent);
                 return true;
             }
 
