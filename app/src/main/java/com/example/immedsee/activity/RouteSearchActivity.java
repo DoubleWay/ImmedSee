@@ -6,6 +6,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -24,6 +25,7 @@ import com.baidu.mapapi.search.sug.SuggestionResult;
 import com.baidu.mapapi.search.sug.SuggestionSearch;
 import com.baidu.mapapi.search.sug.SuggestionSearchOption;
 import com.example.immedsee.R;
+import com.example.immedsee.Utils.SoftKeyBoardListener;
 import com.example.immedsee.adapter.SugAdapter;
 
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.List;
  * 对路线规划的起终点进行suggest搜索
  */
 public class RouteSearchActivity extends AppCompatActivity {
+    private CardView routeSearchCardview;
     private SearchView searchViewSt;
     private SearchView searchViewEn;
     private SuggestionSearch mSuggestionSearch;
@@ -57,6 +60,7 @@ public class RouteSearchActivity extends AppCompatActivity {
         locationAddress=intent.getStringExtra("LocationAddress");
         mLatitude=intent.getDoubleExtra("mLatitude",0);
         mLongitude=intent.getDoubleExtra("mLongitude",0);
+        routeSearchCardview=(CardView)findViewById(R.id.route_search_cardview);
         Toolbar toolbar=(Toolbar)findViewById(R.id.route_search_toolBar);
         toolbar.setTitle("起终点搜索");
         setSupportActionBar(toolbar);
@@ -223,6 +227,36 @@ public class RouteSearchActivity extends AppCompatActivity {
         }
         return  true;
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SoftKeyBoardListener.setListener(this,new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
+            @Override
+            public void keyBoardShow(int height) {
+
+            }
+
+            @Override
+            public void keyBoardHide(int height) {  //当系统软件盘隐藏的时候
+                clearFource();
+            }
+        });
+    }
+
+    private void clearFource(){
+        //清除两个searchview的焦点
+        if (searchViewSt != null||searchViewEn!=null) {
+            searchViewSt.clearFocus();
+            searchViewEn.clearFocus();
+        }
+        //将焦点转移到searchview的父布局card view上
+        routeSearchCardview.setFocusable(true);
+        routeSearchCardview.setFocusableInTouchMode(true);
+        routeSearchCardview.requestFocus();
+    }
+
+    /*
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Log.d("routeSearch", "onItemClick: hhhhhhhh");
@@ -231,6 +265,7 @@ public class RouteSearchActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+*/
 
 
 }

@@ -14,18 +14,12 @@
                 android:id="@+id/post_toolBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/mine_app_theme"
+                android:background="@drawable/bg"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 />
         </android.support.design.widget.AppBarLayout>
-        <!--<android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            >-->
         <com.liaoinstan.springview.widget.SpringView
             android:id="@+id/springview_post"
             android:layout_width="match_parent"
@@ -38,7 +32,6 @@
                 android:layout_height="match_parent"
                 />
         </com.liaoinstan.springview.widget.SpringView>
-        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/add_post"
             android:layout_width="wrap_content"

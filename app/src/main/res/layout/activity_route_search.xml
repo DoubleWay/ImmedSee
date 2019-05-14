@@ -10,12 +10,13 @@
         android:id="@+id/route_search_toolBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/mine_app_theme"
+        android:background="@drawable/bg"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
         >
     </android.support.v7.widget.Toolbar>
     <android.support.v7.widget.CardView
+        android:id="@+id/route_search_cardview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"

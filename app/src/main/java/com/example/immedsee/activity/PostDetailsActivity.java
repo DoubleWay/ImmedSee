@@ -57,7 +57,7 @@ public class PostDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_details);
         Toolbar toolbar = (Toolbar)findViewById(R.id.post_details_toolBar);
-        toolbar.setTitle("悬赏详情");
+        toolbar.setTitle(" ");
         setSupportActionBar(toolbar);
         postTitle=(TextView)findViewById(R.id.post_details_title);
         postContent=(TextView)findViewById(R.id.post_details_content);

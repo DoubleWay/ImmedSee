@@ -22,7 +22,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true"
-                android:background="@color/mine_app_theme" />
+                android:background="@drawable/bg" />
 
             <RelativeLayout
                 android:id="@+id/background_change"

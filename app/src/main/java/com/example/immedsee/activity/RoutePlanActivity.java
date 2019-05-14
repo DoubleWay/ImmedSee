@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -683,4 +684,12 @@ public class RoutePlanActivity extends AppCompatActivity implements BaiduMap.OnM
         super.onDestroy();
     }
 
+    /*public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Log.d("routeSearch", "onItemClick: hhhhhhhh");
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }*/
 }
