@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -93,24 +94,30 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cv_card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="#eef2f3"
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+
+                    >
 
 
                     <RelativeLayout
                         android:id="@+id/user_money"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@color/white"
                         android:clickable="true"
                         android:foreground="?attr/selectableItemBackground"
@@ -122,8 +129,10 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="财富"
+                            android:drawableLeft="@mipmap/ic_mymoney"
+                            android:drawablePadding="10dp"
                             android:textColor="@color/black"
-                            android:textSize="20sp" />
+                            android:textSize="15sp" />
                     </RelativeLayout>
 
                     <View
@@ -135,8 +144,8 @@
                     <RelativeLayout
                         android:id="@+id/user_post"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@color/white"
                         android:clickable="true"
                         android:foreground="?attr/selectableItemBackground"
@@ -148,8 +157,10 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="我的帖子"
+                            android:drawableLeft="@mipmap/ic_mypost"
+                            android:drawablePadding="10dp"
                             android:textColor="@color/black"
-                            android:textSize="20sp" />
+                            android:textSize="15sp" />
                     </RelativeLayout>
 
                     <View
@@ -160,8 +171,8 @@
                     <RelativeLayout
                         android:id="@+id/myPassword_reset"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@color/white"
                         android:clickable="true"
                         android:foreground="?attr/selectableItemBackground"
@@ -173,8 +184,10 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="修改密码"
+                            android:drawableLeft="@mipmap/ic_changepassword"
+                            android:drawablePadding="10dp"
                             android:textColor="@color/black"
-                            android:textSize="20sp" />
+                            android:textSize="15sp" />
                     </RelativeLayout>
 
                     <View
@@ -185,8 +198,8 @@
                     <RelativeLayout
                         android:id="@+id/myPassword_forget"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="15dp"
                         android:background="@color/white"
                         android:clickable="true"
                         android:foreground="?attr/selectableItemBackground"
@@ -198,8 +211,10 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:text="忘记密码"
+                            android:drawableLeft="@mipmap/ic_forgetpassword"
+                            android:drawablePadding="10dp"
                             android:textColor="@color/black"
-                            android:textSize="20sp" />
+                            android:textSize="15sp" />
                     </RelativeLayout>
 
                     <View
@@ -210,7 +225,7 @@
                     <RelativeLayout
                         android:id="@+id/log_out"
                         android:layout_width="match_parent"
-                        android:layout_height="58dp"
+                        android:layout_height="50dp"
                         android:background="@color/white"
                         android:clickable="true"
                         android:foreground="?attr/selectableItemBackground"
@@ -221,6 +236,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+
                             android:gravity="center"
                             android:text="退 出 登 陆"
                             android:textColor="@color/red"
